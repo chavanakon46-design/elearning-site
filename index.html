@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน่วยที่ 3: ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -149,48 +150,42 @@
 </div>
 
 <script>
-    // ******************************************************
-    // ส่วนที่ 1: ตั้งค่าการเชื่อมต่อฐานข้อมูล (Supabase)
-    // ******************************************************
-    
     // ⚠️ นำค่าจาก Supabase ของคุณมาใส่ตรงนี้ ⚠️
     const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
-    
-    // เริ่มทำงานระบบฐานข้อมูล
+
+    // เริ่มการทำงาน Supabase
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ******************************************************
-    // ส่วนที่ 2: ตัวแปรระบบ
-    // ******************************************************
+    // ✅ ประกาศตัวแปร Global ไว้บนสุด (แก้ Error: studentInfo initialization)
     let studentInfo = {};
     let currentLesson = 0;
     let startTime;
     let scores = { 1: 0, 2: 0, 3: 0 };
 
-    // ******************************************************
-    // ส่วนที่ 3: ฟังก์ชันการทำงานหลัก
-    // ******************************************************
-
-    // 1. เริ่มต้นระบบ (Login)
+    // --- ฟังก์ชัน 1: เริ่มต้นระบบ ---
     function startSystem() {
+        // รับค่า
         const name = document.getElementById('stdName').value;
         const sClass = document.getElementById('stdClass').value;
         const num = document.getElementById('stdNumber').value;
 
+        // ตรวจสอบ
         if(!name || !sClass || !num) { 
             alert("กรุณากรอกข้อมูลให้ครบ"); 
             return; 
         }
 
+        // บันทึก
         studentInfo = { name, class: sClass, number: num };
-        startTime = new Date(); // เริ่มจับเวลาจริง
-        
+        startTime = new Date();
+
+        // เปลี่ยนหน้า
         document.getElementById('welcomeText').innerText = `สวัสดี: ${name} (${sClass})`;
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('menuSection').classList.remove('hidden');
-        
-        // นาฬิกาแสดงผล (เดินเล่นๆ ให้รู้ว่าเวลาเดิน)
+
+        // จับเวลา
         setInterval(() => {
             const now = new Date();
             const diff = Math.floor((now - startTime) / 1000);
@@ -200,7 +195,7 @@
         }, 1000);
     }
 
-    // 2. เปลี่ยนหน้าบทเรียน
+    // --- ฟังก์ชันอื่นๆ (เหมือนเดิม) ---
     function goToLesson(num) {
         document.getElementById('menuSection').classList.add('hidden');
         document.getElementById(`lesson${num}Section`).classList.remove('hidden');
@@ -214,34 +209,21 @@
         document.getElementById('menuSection').classList.remove('hidden');
     }
 
-    // 3. แสดงเนื้อหา Jigsaw
     function showContent(id) {
         document.querySelectorAll(`#lesson${currentLesson}Section .content-box`).forEach(el => el.style.display = 'none');
         document.getElementById(id).style.display = 'block';
     }
 
-    // 4. ข้อมูลข้อสอบ (Questions Database)
     const questionsDB = {
-        1: [ 
-            { q: "ข้อใดไม่ใช่ฮาร์ดแวร์?", choices: ["เมาส์", "วินโดวส์", "จอภาพ", "แรม"], ans: 1 }, 
-            { q: "ส่วนใดเปรียบเสมือนสมองของคอมพิวเตอร์?", choices: ["Harddisk", "RAM", "CPU", "Monitor"], ans: 2 } 
-        ],
-        2: [ 
-            { q: "คอมพิวเตอร์ชนิดใดใช้พยากรณ์อากาศ?", choices: ["PC", "Super Computer", "Wearable", "Workstation"], ans: 1 }, 
-            { q: "ข้อใดคือการบำรุงรักษาที่ผิด?", choices: ["ไม่กินขนมหน้าคอม", "เช็ดจอด้วยผ้าแห้ง", "ฉีดน้ำใส่คีย์บอร์ด", "ปิดเครื่องก่อนทำความสะอาด"], ans: 2 } 
-        ],
-        3: [ 
-            { q: "ข้อใดคือสื่อกลางไร้สาย?", choices: ["สาย LAN", "Wi-Fi", "สาย Fiber Optic", "สาย USB"], ans: 1 }, 
-            { q: "Protocol คืออะไร?", choices: ["ผู้ส่ง", "ผู้รับ", "กฎการสื่อสาร", "ตัวกลาง"], ans: 2 } 
-        ]
+        1: [ { q: "ข้อใดไม่ใช่ฮาร์ดแวร์?", choices: ["เมาส์", "วินโดวส์", "จอภาพ", "แรม"], ans: 1 }, { q: "ส่วนใดเปรียบเสมือนสมองของคอมพิวเตอร์?", choices: ["Harddisk", "RAM", "CPU", "Monitor"], ans: 2 } ],
+        2: [ { q: "คอมพิวเตอร์ชนิดใดใช้พยากรณ์อากาศ?", choices: ["PC", "Super Computer", "Wearable", "Workstation"], ans: 1 }, { q: "ข้อใดคือการบำรุงรักษาที่ผิด?", choices: ["ไม่กินขนมหน้าคอม", "เช็ดจอด้วยผ้าแห้ง", "ฉีดน้ำใส่คีย์บอร์ด", "ปิดเครื่องก่อนทำความสะอาด"], ans: 2 } ],
+        3: [ { q: "ข้อใดคือสื่อกลางไร้สาย?", choices: ["สาย LAN", "Wi-Fi", "สาย Fiber Optic", "สาย USB"], ans: 1 }, { q: "Protocol คืออะไร?", choices: ["ผู้ส่ง", "ผู้รับ", "กฎการสื่อสาร", "ตัวกลาง"], ans: 2 } ]
     };
 
-    // 5. เริ่มทำข้อสอบ
     function startQuiz(lessonId) {
         const quizDiv = document.getElementById('quizQuestions');
         quizDiv.innerHTML = "";
         document.getElementById('quizTitle').innerText = `แบบทดสอบบทที่ ${lessonId}`;
-        
         questionsDB[lessonId].forEach((item, index) => {
             let html = `<div class="question"><p>${index+1}. ${item.q}</p>`;
             item.choices.forEach((choice, cIndex) => {
@@ -250,17 +232,14 @@
             html += `</div>`;
             quizDiv.innerHTML += html;
         });
-
         document.getElementById('quizContainer').classList.remove('hidden');
         document.getElementById('quizContainer').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 6. ตรวจและบันทึกคะแนนในตัวแปร
     function submitQuiz() {
         let score = 0;
         const qSet = questionsDB[currentLesson];
         let allAnswered = true;
-
         qSet.forEach((item, index) => {
             const checked = document.querySelector(`input[name="q${index}"]:checked`);
             if(!checked) allAnswered = false;
@@ -268,25 +247,20 @@
         });
 
         if(!allAnswered) { alert("กรุณาทำข้อสอบให้ครบทุกข้อ"); return; }
-
         scores[currentLesson] = score;
         alert(`บันทึกคะแนนบทที่ ${currentLesson} เรียบร้อย! คุณได้ ${score}/${qSet.length} คะแนน`);
-        
         document.getElementById('quizContainer').classList.add('hidden');
         backToMenu();
     }
 
-    // 7. จบการทำงานและส่งข้อมูลเข้า Supabase
     async function finishAll() {
         const btn = document.querySelector('#menuSection button.btn-outline');
         btn.innerText = "กำลังบันทึกข้อมูล...";
         btn.disabled = true;
 
-        // คำนวณเวลาที่ใช้จริง
         const durationSec = Math.floor((new Date() - startTime) / 1000);
         const durationText = Math.floor(durationSec / 60) + " นาที " + (durationSec % 60) + " วินาที";
 
-        // ส่งข้อมูลไป Supabase
         const { data, error } = await supabase
             .from('student_logs')
             .insert([{
@@ -312,4 +286,3 @@
 </script>
 </body>
 </html>
-
