@@ -155,21 +155,22 @@
     let currentLesson = 0;
     let startTime;
     let scores = { 1: 0, 2: 0, 3: 0 };
-    let supabase = null; // สร้างตัวแปรมารอรับค่า
+    
+    // เปลี่ยนชื่อตัวแปรเป็น mySupabase เพื่อป้องกันการชนกันกับตัวแปรอื่นในระบบ
+    let mySupabase = null;
 
     // 2. ตั้งค่า Supabase
     const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
 
-    // --- ส่วนแก้ไขสำคัญ: เชื่อมต่อ Supabase แบบปลอดภัย (ป้องกัน Error) ---
+    // --- ส่วนเชื่อมต่อ Supabase ---
     try {
         if (window.supabase) {
-            // ใช้ window.supabase เพื่อป้องกันการประกาศตัวแปรซ้ำ
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            // ใช้ window.supabase.createClient สร้างการเชื่อมต่อ
+            mySupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             console.log("✅ Supabase Connected Successfully");
         } else {
-            console.error("❌ ไม่พบ Library Supabase (ตรวจสอบอินเทอร์เน็ต)");
-            alert("คำเตือน: โหลดระบบฐานข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต");
+            console.error("❌ ไม่พบ Library Supabase");
         }
     } catch (err) {
         console.error("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ:", err);
@@ -177,7 +178,7 @@
 
     // --- ฟังก์ชัน 1: เริ่มต้นระบบ ---
     function startSystem() {
-        console.log("Start System Pressed"); // เช็คว่าปุ่มทำงานไหม
+        console.log("Start System Pressed"); // เช็คการทำงานปุ่ม
 
         // รับค่า
         const name = document.getElementById('stdName').value;
@@ -270,7 +271,7 @@
 
     // --- ฟังก์ชันจบการทำงาน (ส่งข้อมูล) ---
     async function finishAll() {
-        if (!supabase) {
+        if (!mySupabase) {
             alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (ลอง Refresh หน้าเว็บใหม่)");
             return;
         }
@@ -282,7 +283,8 @@
         const durationSec = Math.floor((new Date() - startTime) / 1000);
         const durationText = Math.floor(durationSec / 60) + " นาที " + (durationSec % 60) + " วินาที";
 
-        const { data, error } = await supabase
+        // ใช้ mySupabase ในการส่งข้อมูล
+        const { data, error } = await mySupabase
             .from('student_logs')
             .insert([{
                 student_name: studentInfo.name,
