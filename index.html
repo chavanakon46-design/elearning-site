@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>หน่วยที่ 3: ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --primary: #2563eb; --secondary: #475569; --bg: #f1f5f9; }
+        body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn:hover { background: #1d4ed8; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        
+        /* Inputs */
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+        
+        /* Headers */
+        h1, h2, h3 { color: #0f172a; margin-top: 0; }
+        .lesson-header { background: #eff6ff; padding: 15px; border-left: 5px solid var(--primary); margin-bottom: 20px; border-radius: 5px; }
+
+        /* Expert Topic Cards (Jigsaw) */
+        .expert-card { border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .expert-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: var(--primary); }
+        .expert-icon { font-size: 30px; margin-bottom: 10px; display: block; }
+
+        /* Quiz Styles */
+        .quiz-box { background: #f8fafc; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .question { margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
+        
+        /* Content Section */
+        .content-box { display: none; background: #fff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; margin-top: 20px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="loginSection">
+        <h1 style="text-align: center;">เข้าสู่บทเรียนออนไลน์</h1>
+        <h3 style="text-align: center; color: var(--secondary);">เรื่อง ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</h3>
+        <hr>
+        <div style="max-width: 400px; margin: 0 auto;">
+            <label>ชื่อ-นามสกุล</label>
+            <input type="text" id="stdName" placeholder="ระบุชื่อจริง">
+            <label>ระดับชั้น</label>
+            <input type="text" id="stdClass" placeholder="เช่น ม.2/1">
+            <label>เลขที่</label>
+            <input type="number" id="stdNumber" placeholder="ระบุเลขที่">
+            <button class="btn" style="width: 100%; margin-top: 15px;" onclick="startSystem()">ลงชื่อเข้าเรียน</button>
+        </div>
+    </div>
+
+    <div id="menuSection" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 id="welcomeText">ยินดีต้อนรับ</h2>
+            <span id="timerDisplay" style="color: var(--secondary);">00:00</span>
+        </div>
+        <hr>
+        <p>เลือกบทเรียนตามลำดับ:</p>
+        <div class="grid-menu">
+            <div class="expert-card" onclick="goToLesson(1)">
+                <span class="expert-icon">🖥️</span>
+                <h3>บทที่ 1</h3>
+                <p>องค์ประกอบระบบคอมพิวเตอร์</p>
+            </div>
+            <div class="expert-card" onclick="goToLesson(2)">
+                <span class="expert-icon">🛠️</span>
+                <h3>บทที่ 2</h3>
+                <p>การประยุกต์ใช้และแก้ปัญหา</p>
+            </div>
+            <div class="expert-card" onclick="goToLesson(3)">
+                <span class="expert-icon">📡</span>
+                <h3>บทที่ 3</h3>
+                <p>เทคโนโลยีการสื่อสาร</p>
+            </div>
+        </div>
+        <div style="margin-top: 30px; text-align: center;">
+             <button class="btn btn-outline" onclick="finishAll()">ส่งคะแนนรวมและจบการทำงาน</button>
+        </div>
+    </div>
+
+    <div id="lesson1Section" class="hidden">
+        <div class="lesson-header">
+            <h2>บทที่ 1: องค์ประกอบและหลักการทำงาน</h2>
+            <p><strong>คำชี้แจง:</strong> เลือกหัวข้อที่ได้รับมอบหมาย (Expert Group) เพื่อศึกษา [cite: 566]</p>
+        </div>
+
+        <div class="grid-menu">
+            <button class="btn btn-outline" onclick="showContent('L1-HW')">1. ฮาร์ดแวร์</button>
+            <button class="btn btn-outline" onclick="showContent('L1-SW')">2. ซอฟต์แวร์</button>
+            <button class="btn btn-outline" onclick="showContent('L1-PP')">3. บุคลากร</button>
+            <button class="btn btn-outline" onclick="showContent('L1-DT')">4. ข้อมูล</button>
+            <button class="btn btn-outline" onclick="showContent('L1-PC')">5. กระบวนการ</button>
+        </div>
+
+        <div id="L1-HW" class="content-box">
+            <h3>Hardware (ฮาร์ดแวร์)</h3>
+            <p>คือ ส่วนประกอบของเครื่องคอมพิวเตอร์ที่จับต้องได้ เช่น CPU, RAM, Hard Disk, จอภาพ, คีย์บอร์ด [cite: 552]</p>
+                    </div>
+        <div id="L1-SW" class="content-box">
+            <h3>Software (ซอฟต์แวร์)</h3>
+            <p>คือ ชุดคำสั่งหรือโปรแกรมที่สั่งให้ฮาร์ดแวร์ทำงาน แบ่งเป็น ซอฟต์แวร์ระบบ (OS) และซอฟต์แวร์ประยุกต์ [cite: 552]</p>
+        </div>
+        <div id="L1-PP" class="content-box">
+            <h3>People (บุคลากร)</h3>
+            <p>คือ ผู้ใช้งานหรือผู้ดูแลระบบ เช่น โปรแกรมเมอร์, ผู้ใช้ทั่วไป, ผู้ดูแลระบบ (Admin) [cite: 552]</p>
+        </div>
+        <div id="L1-DT" class="content-box">
+            <h3>Data (ข้อมูลและสารสนเทศ)</h3>
+            <p>คือ ข้อเท็จจริงดิบ (Data) ที่เมื่อผ่านการประมวลผลแล้วจะกลายเป็นสารสนเทศ (Information) ที่มีประโยชน์ [cite: 552]</p>
+        </div>
+        <div id="L1-PC" class="content-box">
+            <h3>Process (กระบวนการ)</h3>
+            <p>คือ ขั้นตอนการทำงานเพื่อให้ได้ผลลัพธ์ ประกอบด้วย รับเข้า > ประมวลผล > แสดงผล > จัดเก็บ [cite: 552]</p>
+        </div>
+
+        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="startQuiz(1)">ทำแบบทดสอบย่อย บทที่ 1</button>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="backToMenu()">กลับหน้าหลัก</button>
+    </div>
+
+    <div id="lesson2Section" class="hidden">
+        <div class="lesson-header">
+            <h2>บทที่ 2: ประเภทคอมพิวเตอร์และการแก้ปัญหา</h2>
+            <p><strong>คำชี้แจง:</strong> ศึกษาประเภทของคอมพิวเตอร์เพื่อนำไปเลือกใช้งานให้เหมาะสม [cite: 614]</p>
+        </div>
+
+        <div class="grid-menu">
+            <button class="btn btn-outline" onclick="showContent('L2-SP')">Super Computer</button>
+            <button class="btn btn-outline" onclick="showContent('L2-MF')">Mainframe</button>
+            <button class="btn btn-outline" onclick="showContent('L2-WS')">Workstation</button>
+            <button class="btn btn-outline" onclick="showContent('L2-PC')">Personal Computer</button>
+            <button class="btn btn-outline" onclick="showContent('L2-WR')">Wearable</button>
+        </div>
+
+        <div id="L2-SP" class="content-box">
+            <h3>Super Computer</h3>
+            <p>คอมพิวเตอร์ที่มีประสิทธิภาพสูงสุด ใช้ในการคำนวณที่ซับซ้อนมาก เช่น พยากรณ์อากาศ [cite: 616]</p>
+        </div>
+        <div id="L2-MF" class="content-box">
+            <h3>Mainframe Computer</h3>
+            <p>คอมพิวเตอร์ขนาดใหญ่ รองรับผู้ใช้จำนวนมาก ใช้ในธนาคาร หรือองค์กรใหญ่ [cite: 617]</p>
+        </div>
+        <div id="L2-WS" class="content-box">
+            <h3>Workstation</h3>
+            <p>คล้าย PC แต่สเปคสูงกว่ามาก ใช้สำหรับงานกราฟิก วิศวกรรม หรือตัดต่อวิดีโอ [cite: 618]</p>
+        </div>
+        <div id="L2-PC" class="content-box">
+            <h3>Personal Computer (PC)</h3>
+            <p>คอมพิวเตอร์ส่วนบุคคล สำหรับใช้งานทั่วไปในบ้านหรือสำนักงาน [cite: 619]</p>
+        </div>
+        <div id="L2-WR" class="content-box">
+            <h3>Wearable Computer</h3>
+            <p>คอมพิวเตอร์แบบสวมใส่ เช่น Smart Watch, แว่นตาอัจฉริยะ [cite: 620]</p>
+        </div>
+
+        <div style="margin-top: 20px; background: #fff3cd; padding: 15px; border-radius: 8px;">
+            <strong>💡 การบำรุงรักษา:</strong> ไม่ควรทำความสะอาดขณะเปิดเครื่อง และระวังน้ำ/ความชื้น [cite: 629]
+        </div>
+
+        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="startQuiz(2)">ทำแบบทดสอบย่อย บทที่ 2</button>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="backToMenu()">กลับหน้าหลัก</button>
+    </div>
+
+    <div id="lesson3Section" class="hidden">
+        <div class="lesson-header">
+            <h2>บทที่ 3: เทคโนโลยีการสื่อสาร</h2>
+            <p><strong>คำชี้แจง:</strong> ศึกษาองค์ประกอบของการสื่อสาร [cite: 664]</p>
+        </div>
+
+        <div class="grid-menu">
+            <button class="btn btn-outline" onclick="showContent('L3-SD')">ผู้ส่ง (Sender)</button>
+            <button class="btn btn-outline" onclick="showContent('L3-RC')">ผู้รับ (Receiver)</button>
+            <button class="btn btn-outline" onclick="showContent('L3-MS')">ข่าวสาร (Message)</button>
+            <button class="btn btn-outline" onclick="showContent('L3-MD')">สื่อกลาง (Medium)</button>
+            <button class="btn btn-outline" onclick="showContent('L3-PT')">โพรโตคอล (Protocol)</button>
+        </div>
+
+        <div id="L3-SD" class="content-box">
+            <h3>ผู้ส่งสาร (Sender)</h3>
+            <p>ผู้เริ่มต้นส่งข้อมูล อาจเป็นคนหรืออุปกรณ์ เช่น คอมพิวเตอร์ต้นทาง [cite: 665]</p>
+        </div>
+        <div id="L3-RC" class="content-box">
+            <h3>ผู้รับสาร (Receiver)</h3>
+            <p>ปลายทางที่รับข้อมูล เช่น ผู้ฟัง หรือคอมพิวเตอร์ปลายทาง [cite: 666]</p>
+        </div>
+        <div id="L3-MS" class="content-box">
+            <h3>ข่าวสาร (Message)</h3>
+            <p>ข้อมูล ตัวเลข รูปภาพ หรือเสียง ที่ต้องการส่ง [cite: 667]</p>
+        </div>
+        <div id="L3-MD" class="content-box">
+            <h3>สื่อกลาง (Medium)</h3>
+            <p>ตัวกลางที่ข้อมูลเดินทางผ่าน มีทั้งแบบมีสาย (LAN) และไร้สาย (Wi-Fi) [cite: 668]</p>
+        </div>
+        <div id="L3-PT" class="content-box">
+            <h3>โพรโตคอล (Protocol)</h3>
+            <p>กฎกติกาหรือข้อตกลงในการสื่อสาร เพื่อให้คุยกันรู้เรื่อง [cite: 669]</p>
+        </div>
+
+        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="startQuiz(3)">ทำแบบทดสอบหลังเรียน (Post-test)</button>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="backToMenu()">กลับหน้าหลัก</button>
+    </div>
+
+    <div id="quizContainer" class="hidden quiz-box">
+        <h2 id="quizTitle">แบบทดสอบ</h2>
+        <div id="quizQuestions"></div>
+        <button class="btn" onclick="submitQuiz()">ส่งคำตอบ</button>
+    </div>
+
+</div>
+
+<script>
+    // 1. ตั้งค่า Supabase
+    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; // ใส่ URL ของคุณ
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; // ใส่ Key ของคุณ
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // 2. ตัวแปรระบบ
+    let studentInfo = {};
+    let currentLesson = 0;
+    let startTime;
+    let scores = { 1: 0, 2: 0, 3: 0 };
+
+    // 3. เริ่มต้นระบบ
+    function startSystem() {
+        const name = document.getElementById('stdName').value;
+        const sClass = document.getElementById('stdClass').value;
+        const num = document.getElementById('stdNumber').value;
+
+        if(!name || !sClass || !num) { alert("กรุณากรอกข้อมูลให้ครบ"); return; }
+
+        studentInfo = { name, class: sClass, number: num };
+        startTime = new Date();
+        
+        document.getElementById('welcomeText').innerText = `สวัสดี: ${name} (${sClass})`;
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('menuSection').classList.remove('hidden');
+        
+        // เริ่มจับเวลาแสดงผลเล่นๆ
+        setInterval(() => {
+            const now = new Date();
+            const diff = Math.floor((now - startTime) / 1000);
+            const m = Math.floor(diff / 60).toString().padStart(2, '0');
+            const s = (diff % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `เวลาเรียน: ${m}:${s}`;
+        }, 1000);
+    }
+
+    // 4. การนำทาง
+    function goToLesson(num) {
+        document.getElementById('menuSection').classList.add('hidden');
+        document.getElementById(`lesson${num}Section`).classList.remove('hidden');
+        currentLesson = num;
+        
+        // ซ่อนเนื้อหาเก่าที่เปิดค้างไว้
+        document.querySelectorAll('.content-box').forEach(el => el.style.display = 'none');
+        document.getElementById('quizContainer').classList.add('hidden');
+    }
+
+    function backToMenu() {
+        document.getElementById(`lesson${currentLesson}Section`).classList.add('hidden');
+        document.getElementById('menuSection').classList.remove('hidden');
+    }
+
+    function showContent(id) {
+        // ซ่อนอันอื่นก่อน เพื่อให้โฟกัสทีละเรื่อง
+        document.querySelectorAll(`#lesson${currentLesson}Section .content-box`).forEach(el => el.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+
+    // 5. ระบบข้อสอบ
+    const questionsDB = {
+        1: [ // ข้อสอบบทที่ 1
+            { q: "ข้อใดไม่ใช่ฮาร์ดแวร์?", choices: ["เมาส์", "วินโดวส์", "จอภาพ", "แรม"], ans: 1 },
+            { q: "ส่วนใดเปรียบเสมือนสมองของคอมพิวเตอร์?", choices: ["Harddisk", "RAM", "CPU", "Monitor"], ans: 2 }
+        ],
+        2: [ // ข้อสอบบทที่ 2
+            { q: "คอมพิวเตอร์ชนิดใดใช้พยากรณ์อากาศ?", choices: ["PC", "Super Computer", "Wearable", "Workstation"], ans: 1 },
+            { q: "ข้อใดคือการบำรุงรักษาที่ผิด?", choices: ["ไม่กินขนมหน้าคอม", "เช็ดจอด้วยผ้าแห้ง", "ฉีดน้ำใส่คีย์บอร์ด", "ปิดเครื่องก่อนทำความสะอาด"], ans: 2 }
+        ],
+        3: [ // ข้อสอบบทที่ 3 (Post-test)
+            { q: "ข้อใดคือสื่อกลางไร้สาย?", choices: ["สาย LAN", "Wi-Fi", "สาย Fiber Optic", "สาย USB"], ans: 1 },
+            { q: "Protocol คืออะไร?", choices: ["ผู้ส่ง", "ผู้รับ", "กฎการสื่อสาร", "ตัวกลาง"], ans: 2 }
+        ]
+    };
+
+    function startQuiz(lessonId) {
+        const quizDiv = document.getElementById('quizQuestions');
+        quizDiv.innerHTML = ""; // ล้างเก่า
+        document.getElementById('quizTitle').innerText = `แบบทดสอบบทที่ ${lessonId}`;
+        
+        questionsDB[lessonId].forEach((item, index) => {
+            let html = `<div class="question"><p>${index+1}. ${item.q}</p>`;
+            item.choices.forEach((choice, cIndex) => {
+                html += `<label style="margin-right:15px;"><input type="radio" name="q${index}" value="${cIndex}"> ${choice}</label>`;
+            });
+            html += `</div>`;
+            quizDiv.innerHTML += html;
+        });
+
+        document.getElementById('quizContainer').classList.remove('hidden');
+        // เลื่อนจอลงมาหาข้อสอบ
+        document.getElementById('quizContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function submitQuiz() {
+        let score = 0;
+        const qSet = questionsDB[currentLesson];
+        let allAnswered = true;
+
+        qSet.forEach((item, index) => {
+            const checked = document.querySelector(`input[name="q${index}"]:checked`);
+            if(!checked) allAnswered = false;
+            else if(parseInt(checked.value) === item.ans) score++;
+        });
+
+        if(!allAnswered) { alert("กรุณาทำข้อสอบให้ครบทุกข้อ"); return; }
+
+        scores[currentLesson] = score;
+        alert(`บันทึกคะแนนบทที่ ${currentLesson} เรียบร้อย! คุณได้ ${score}/${qSet.length} คะแนน`);
+        
+        document.getElementById('quizContainer').classList.add('hidden');
+        backToMenu();
+    }
+
+    // 6. ส่งข้อมูลเข้า Supabase
+    async function finishAll() {
+        const btn = document.querySelector('#menuSection button.btn-outline');
+        btn.innerText = "กำลังบันทึก...";
+        btn.disabled = true;
+
+        const durationSec = Math.floor((new Date() - startTime) / 1000);
+        const durationText = Math.floor(durationSec / 60) + " นาที " + (durationSec % 60) + " วินาที";
+
+        const { data, error } = await supabase
+            .from('student_logs')
+            .insert([{
+                student_name: studentInfo.name,
+                student_class: studentInfo.class,
+                student_number: studentInfo.number,
+                score_lesson1: scores[1],
+                score_lesson2: scores[2],
+                score_lesson3: scores[3],
+                duration_text: durationText
+            }]);
+
+        if(error) {
+            alert("เกิดข้อผิดพลาด: " + error.message);
+            btn.disabled = false;
+        } else {
+            alert("บันทึกข้อมูลสำเร็จ! ขอบคุณที่ตั้งใจเรียน");
+            location.reload(); // รีโหลดหน้าใหม่
+        }
+    }
+</script>
+
+</body>
+</html>
