@@ -149,48 +149,62 @@
 </div>
 
 <script>
-    // --- โหมดทดสอบ (ปิด Supabase ชั่วคราวเพื่อให้ปุ่มกดได้) ---
+    // ******************************************************
+    // ส่วนที่ 1: ตั้งค่าการเชื่อมต่อฐานข้อมูล (Supabase)
+    // ******************************************************
     
+    // ⚠️ นำค่าจาก Supabase ของคุณมาใส่ตรงนี้ ⚠️
+    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
+    
+    // เริ่มทำงานระบบฐานข้อมูล
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ******************************************************
+    // ส่วนที่ 2: ตัวแปรระบบ
+    // ******************************************************
     let studentInfo = {};
     let currentLesson = 0;
+    let startTime;
     let scores = { 1: 0, 2: 0, 3: 0 };
-    
-    // ฟังก์ชัน 1: เริ่มต้นระบบ
+
+    // ******************************************************
+    // ส่วนที่ 3: ฟังก์ชันการทำงานหลัก
+    // ******************************************************
+
+    // 1. เริ่มต้นระบบ (Login)
     function startSystem() {
-        // ดึงค่า
         const name = document.getElementById('stdName').value;
         const sClass = document.getElementById('stdClass').value;
         const num = document.getElementById('stdNumber').value;
 
-        // เช็คค่าว่าง
         if(!name || !sClass || !num) { 
             alert("กรุณากรอกข้อมูลให้ครบ"); 
             return; 
         }
 
-        // บันทึกและเปลี่ยนหน้า
         studentInfo = { name, class: sClass, number: num };
+        startTime = new Date(); // เริ่มจับเวลาจริง
         
         document.getElementById('welcomeText').innerText = `สวัสดี: ${name} (${sClass})`;
         document.getElementById('loginSection').classList.add('hidden');
         document.getElementById('menuSection').classList.remove('hidden');
         
-        // จับเวลาจำลอง
-        let seconds = 0;
+        // นาฬิกาแสดงผล (เดินเล่นๆ ให้รู้ว่าเวลาเดิน)
         setInterval(() => {
-            seconds++;
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
+            const now = new Date();
+            const diff = Math.floor((now - startTime) / 1000);
+            const m = Math.floor(diff / 60).toString().padStart(2, '0');
+            const s = (diff % 60).toString().padStart(2, '0');
             document.getElementById('timerDisplay').innerText = `เวลาเรียน: ${m}:${s}`;
         }, 1000);
     }
 
-    // ฟังก์ชัน 2: เปลี่ยนหน้าบทเรียน
+    // 2. เปลี่ยนหน้าบทเรียน
     function goToLesson(num) {
         document.getElementById('menuSection').classList.add('hidden');
         document.getElementById(`lesson${num}Section`).classList.remove('hidden');
         currentLesson = num;
-        // ซ่อนเนื้อหาเก่า
         document.querySelectorAll('.content-box').forEach(el => el.style.display = 'none');
         document.getElementById('quizContainer').classList.add('hidden');
     }
@@ -200,13 +214,13 @@
         document.getElementById('menuSection').classList.remove('hidden');
     }
 
-    // ฟังก์ชัน 3: แสดงเนื้อหา Jigsaw
+    // 3. แสดงเนื้อหา Jigsaw
     function showContent(id) {
         document.querySelectorAll(`#lesson${currentLesson}Section .content-box`).forEach(el => el.style.display = 'none');
         document.getElementById(id).style.display = 'block';
     }
 
-    // ข้อมูลข้อสอบ
+    // 4. ข้อมูลข้อสอบ (Questions Database)
     const questionsDB = {
         1: [ 
             { q: "ข้อใดไม่ใช่ฮาร์ดแวร์?", choices: ["เมาส์", "วินโดวส์", "จอภาพ", "แรม"], ans: 1 }, 
@@ -222,7 +236,7 @@
         ]
     };
 
-    // ฟังก์ชัน 4: เริ่มทำข้อสอบ
+    // 5. เริ่มทำข้อสอบ
     function startQuiz(lessonId) {
         const quizDiv = document.getElementById('quizQuestions');
         quizDiv.innerHTML = "";
@@ -241,7 +255,7 @@
         document.getElementById('quizContainer').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ฟังก์ชัน 5: ส่งข้อสอบ
+    // 6. ตรวจและบันทึกคะแนนในตัวแปร
     function submitQuiz() {
         let score = 0;
         const qSet = questionsDB[currentLesson];
@@ -262,12 +276,39 @@
         backToMenu();
     }
 
-    // ฟังก์ชัน 6: จบการทำงาน (Mockup)
-    function finishAll() {
-        alert("นี่คือโหมดทดสอบ: ระบบจะบันทึกข้อมูลจริงเมื่อคุณเชื่อมต่อ Supabase");
-        location.reload();
-    }
+    // 7. จบการทำงานและส่งข้อมูลเข้า Supabase
+    async function finishAll() {
+        const btn = document.querySelector('#menuSection button.btn-outline');
+        btn.innerText = "กำลังบันทึกข้อมูล...";
+        btn.disabled = true;
 
+        // คำนวณเวลาที่ใช้จริง
+        const durationSec = Math.floor((new Date() - startTime) / 1000);
+        const durationText = Math.floor(durationSec / 60) + " นาที " + (durationSec % 60) + " วินาที";
+
+        // ส่งข้อมูลไป Supabase
+        const { data, error } = await supabase
+            .from('student_logs')
+            .insert([{
+                student_name: studentInfo.name,
+                student_class: studentInfo.class,
+                student_number: studentInfo.number,
+                score_lesson1: scores[1],
+                score_lesson2: scores[2],
+                score_lesson3: scores[3],
+                duration_text: durationText
+            }]);
+
+        if(error) {
+            console.error(error);
+            alert("เกิดข้อผิดพลาด: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "ลองส่งใหม่อีกครั้ง";
+        } else {
+            alert("✅ บันทึกข้อมูลสำเร็จ! ขอบคุณที่ตั้งใจเรียน");
+            location.reload(); 
+        }
+    }
 </script>
 </body>
 </html>
