@@ -150,18 +150,18 @@
 </div>
 
 <script>
-    // ⚠️ นำค่าจาก Supabase ของคุณมาใส่ตรงนี้ ⚠️
-    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
-
-    // เริ่มการทำงาน Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // ✅ ประกาศตัวแปร Global ไว้บนสุด (แก้ Error: studentInfo initialization)
+    // 1. ตัวแปร Global (ต้องประกาศไว้บนสุด เพื่อแก้ Error)
     let studentInfo = {};
     let currentLesson = 0;
     let startTime;
     let scores = { 1: 0, 2: 0, 3: 0 };
+
+    // 2. ตั้งค่า Supabase (อย่าลืมใส่ค่าของคุณเอง)
+    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; // <-- ใส่ URL ของคุณ
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; // <-- ใส่ Key ของคุณ
+    
+    // เริ่มทำงานระบบฐานข้อมูล
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // --- ฟังก์ชัน 1: เริ่มต้นระบบ ---
     function startSystem() {
@@ -195,7 +195,7 @@
         }, 1000);
     }
 
-    // --- ฟังก์ชันอื่นๆ (เหมือนเดิม) ---
+    // --- ฟังก์ชันอื่นๆ ---
     function goToLesson(num) {
         document.getElementById('menuSection').classList.add('hidden');
         document.getElementById(`lesson${num}Section`).classList.remove('hidden');
