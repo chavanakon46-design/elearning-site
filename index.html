@@ -150,21 +150,35 @@
 </div>
 
 <script>
-    // 1. ตัวแปร Global (ต้องประกาศไว้บนสุด เพื่อแก้ Error)
+    // 1. ตัวแปร Global
     let studentInfo = {};
     let currentLesson = 0;
     let startTime;
     let scores = { 1: 0, 2: 0, 3: 0 };
+    let supabase = null; // สร้างตัวแปรมารอรับค่า
 
-    // 2. ตั้งค่า Supabase (อย่าลืมใส่ค่าของคุณเอง)
-    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; // <-- ใส่ URL ของคุณ
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; // <-- ใส่ Key ของคุณ
-    
-    // เริ่มทำงานระบบฐานข้อมูล
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // 2. ตั้งค่า Supabase
+    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
+
+    // --- ส่วนแก้ไขสำคัญ: เชื่อมต่อ Supabase แบบปลอดภัย (ป้องกัน Error) ---
+    try {
+        if (window.supabase) {
+            // ใช้ window.supabase เพื่อป้องกันการประกาศตัวแปรซ้ำ
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log("✅ Supabase Connected Successfully");
+        } else {
+            console.error("❌ ไม่พบ Library Supabase (ตรวจสอบอินเทอร์เน็ต)");
+            alert("คำเตือน: โหลดระบบฐานข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต");
+        }
+    } catch (err) {
+        console.error("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ:", err);
+    }
 
     // --- ฟังก์ชัน 1: เริ่มต้นระบบ ---
     function startSystem() {
+        console.log("Start System Pressed"); // เช็คว่าปุ่มทำงานไหม
+
         // รับค่า
         const name = document.getElementById('stdName').value;
         const sClass = document.getElementById('stdClass').value;
@@ -195,7 +209,7 @@
         }, 1000);
     }
 
-    // --- ฟังก์ชันอื่นๆ ---
+    // --- ฟังก์ชันนำทาง ---
     function goToLesson(num) {
         document.getElementById('menuSection').classList.add('hidden');
         document.getElementById(`lesson${num}Section`).classList.remove('hidden');
@@ -214,6 +228,7 @@
         document.getElementById(id).style.display = 'block';
     }
 
+    // --- ฐานข้อมูลข้อสอบ ---
     const questionsDB = {
         1: [ { q: "ข้อใดไม่ใช่ฮาร์ดแวร์?", choices: ["เมาส์", "วินโดวส์", "จอภาพ", "แรม"], ans: 1 }, { q: "ส่วนใดเปรียบเสมือนสมองของคอมพิวเตอร์?", choices: ["Harddisk", "RAM", "CPU", "Monitor"], ans: 2 } ],
         2: [ { q: "คอมพิวเตอร์ชนิดใดใช้พยากรณ์อากาศ?", choices: ["PC", "Super Computer", "Wearable", "Workstation"], ans: 1 }, { q: "ข้อใดคือการบำรุงรักษาที่ผิด?", choices: ["ไม่กินขนมหน้าคอม", "เช็ดจอด้วยผ้าแห้ง", "ฉีดน้ำใส่คีย์บอร์ด", "ปิดเครื่องก่อนทำความสะอาด"], ans: 2 } ],
@@ -253,7 +268,13 @@
         backToMenu();
     }
 
+    // --- ฟังก์ชันจบการทำงาน (ส่งข้อมูล) ---
     async function finishAll() {
+        if (!supabase) {
+            alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (ลอง Refresh หน้าเว็บใหม่)");
+            return;
+        }
+
         const btn = document.querySelector('#menuSection button.btn-outline');
         btn.innerText = "กำลังบันทึกข้อมูล...";
         btn.disabled = true;
