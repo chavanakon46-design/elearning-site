@@ -3,309 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หน่วยที่ 3: ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</title>
+    <title>E-Learning System V.2 (CMS)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --primary: #2563eb; --secondary: #475569; --bg: #f1f5f9; }
-        body { font-family: 'Sarabun', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .hidden { display: none !important; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn:hover { background: #1d4ed8; }
-        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: #eff6ff; }
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
-        h1, h2, h3 { color: #0f172a; margin-top: 0; }
-        .lesson-header { background: #eff6ff; padding: 15px; border-left: 5px solid var(--primary); margin-bottom: 20px; border-radius: 5px; }
-        .expert-card { border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px; cursor: pointer; transition: 0.3s; text-align: center; }
-        .expert-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: var(--primary); }
-        .expert-icon { font-size: 30px; margin-bottom: 10px; display: block; }
-        .quiz-box { background: #f8fafc; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        .question { margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
-        .content-box { display: none; background: #fff; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px; margin-top: 20px; animation: fadeIn 0.5s; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f3f4f6; }
+        .iframe-container iframe { width: 100%; height: 400px; border-radius: 8px; border: none; }
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-<div class="container">
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg min-h-screen relative">
     
-    <div id="loginSection">
-        <h1 style="text-align: center;">เข้าสู่บทเรียนออนไลน์</h1>
-        <h3 style="text-align: center; color: var(--secondary);">เรื่อง ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</h3>
-        <hr>
-        <div style="max-width: 400px; margin: 0 auto;">
-            <label>ชื่อ-นามสกุล</label>
-            <input type="text" id="stdName" placeholder="ระบุชื่อจริง">
-            <label>ระดับชั้น</label>
-            <input type="text" id="stdClass" placeholder="เช่น ม.2/1">
-            <label>เลขที่</label>
-            <input type="number" id="stdNumber" placeholder="ระบุเลขที่">
-            <button class="btn" style="width: 100%; margin-top: 15px;" onclick="startSystem()">ลงชื่อเข้าเรียน</button>
+    <header class="flex justify-between items-center border-b pb-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-blue-600">วิชาคอมพิวเตอร์และเทคโนโลยี</h1>
+            <p class="text-gray-500 text-sm">ระบบเรียนรู้ด้วยตนเอง</p>
+        </div>
+        <div id="userInfo" class="text-right hidden">
+            <span id="userDisplay" class="font-bold text-gray-700"></span>
+            <button onclick="logout()" class="text-xs text-red-500 underline ml-2">ออกระบบ</button>
+        </div>
+    </header>
+
+    <div id="loginSection" class="text-center py-10 fade-in">
+        <h2 class="text-xl mb-4">ลงชื่อเข้าเรียน</h2>
+        <div class="max-w-xs mx-auto space-y-3">
+            <input type="text" id="stdName" placeholder="ชื่อ-นามสกุล (หรือพิมพ์ admin)" class="w-full p-2 border rounded">
+            <input type="text" id="stdClass" placeholder="ชั้น (เช่น ม.2/1)" class="w-full p-2 border rounded">
+            <input type="number" id="stdNumber" placeholder="เลขที่ / รหัสผ่าน" class="w-full p-2 border rounded">
+            <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">เข้าสู่ระบบ</button>
         </div>
     </div>
 
-    <div id="menuSection" class="hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 id="welcomeText">ยินดีต้อนรับ</h2>
-            <span id="timerDisplay" style="color: var(--secondary);">เวลาเรียน: 00:00</span>
+    <div id="studentDashboard" class="hidden fade-in">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <button onclick="loadLessonGroup('lesson1')" class="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 text-left">
+                <div class="text-2xl mb-2">🖥️</div>
+                <div class="font-bold">บทที่ 1</div>
+                <div class="text-xs text-gray-500">องค์ประกอบระบบคอมฯ</div>
+            </button>
+            <button onclick="loadLessonGroup('lesson2')" class="p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 text-left">
+                <div class="text-2xl mb-2">🛠️</div>
+                <div class="font-bold">บทที่ 2</div>
+                <div class="text-xs text-gray-500">การแก้ปัญหา</div>
+            </button>
+            <button onclick="loadLessonGroup('lesson3')" class="p-4 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 text-left">
+                <div class="text-2xl mb-2">📡</div>
+                <div class="font-bold">บทที่ 3</div>
+                <div class="text-xs text-gray-500">เทคโนโลยีสื่อสาร</div>
+            </button>
         </div>
-        <hr>
-        <p>เลือกบทเรียนตามลำดับ:</p>
-        <div class="grid-menu">
-            <div class="expert-card" onclick="goToLesson(1)">
-                <span class="expert-icon">🖥️</span>
-                <h3>บทที่ 1</h3>
-                <p>องค์ประกอบระบบคอมพิวเตอร์</p>
+
+        <div id="contentArea" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="lessonTitle" class="text-xl font-bold">หัวข้อบทเรียน</h2>
+                <button onclick="backToDash()" class="text-gray-500 hover:text-gray-800">⬅ กลับหน้าหลัก</button>
             </div>
-            <div class="expert-card" onclick="goToLesson(2)">
-                <span class="expert-icon">🛠️</span>
-                <h3>บทที่ 2</h3>
-                <p>การประยุกต์ใช้และแก้ปัญหา</p>
-            </div>
-            <div class="expert-card" onclick="goToLesson(3)">
-                <span class="expert-icon">📡</span>
-                <h3>บทที่ 3</h3>
-                <p>เทคโนโลยีการสื่อสาร</p>
+            
+            <div id="subTopicMenu" class="flex flex-wrap gap-2 mb-6"></div>
+
+            <div id="lessonViewer" class="bg-gray-50 p-6 rounded-lg border min-h-[300px] iframe-container">
+                <p class="text-center text-gray-400 mt-10">เลือกหัวข้อด้านบนเพื่อเริ่มศึกษา</p>
             </div>
         </div>
-        <div style="margin-top: 30px; text-align: center;">
-             <button class="btn btn-outline" onclick="finishAll()">จบการทำงาน (ส่งครู)</button>
-        </div>
     </div>
 
-    <div id="lesson1Section" class="hidden">
-        <div class="lesson-header">
-            <h2>บทที่ 1: องค์ประกอบและหลักการทำงาน</h2>
-            <p><strong>คำชี้แจง:</strong> เลือกหัวข้อที่ได้รับมอบหมาย (Expert Group) เพื่อศึกษา</p>
+    <div id="adminDashboard" class="hidden fade-in">
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <h3 class="font-bold text-yellow-800">โหมดผู้ดูแลระบบ (Admin)</h3>
+            <p class="text-sm text-yellow-700">คุณสามารถเพิ่มเนื้อหา รูปภาพ หรือฝังโค้ดจาก Canva ได้ที่นี่</p>
         </div>
-        <div class="grid-menu">
-            <button class="btn btn-outline" onclick="showContent('L1-HW')">1. ฮาร์ดแวร์</button>
-            <button class="btn btn-outline" onclick="showContent('L1-SW')">2. ซอฟต์แวร์</button>
-            <button class="btn btn-outline" onclick="showContent('L1-PP')">3. บุคลากร</button>
-            <button class="btn btn-outline" onclick="showContent('L1-DT')">4. ข้อมูล</button>
-            <button class="btn btn-outline" onclick="showContent('L1-PC')">5. กระบวนการ</button>
+
+        <div class="flex gap-4 mb-4">
+            <div class="w-1/3">
+                <h4 class="font-bold mb-2">รายการเนื้อหาที่มี</h4>
+                <div id="adminLessonList" class="bg-white border rounded h-96 overflow-y-auto p-2 space-y-2"></div>
+                <button onclick="prepareNewLesson()" class="w-full mt-2 bg-green-500 text-white py-2 rounded">+ เพิ่มเนื้อหาใหม่</button>
+            </div>
+            <div class="w-2/3">
+                <h4 class="font-bold mb-2">ตัวแก้ไขเนื้อหา</h4>
+                <div class="space-y-3">
+                    <input type="text" id="editTitle" placeholder="ชื่อหัวข้อ (เช่น: ฮาร์ดแวร์)" class="w-full p-2 border rounded">
+                    <select id="editCategory" class="w-full p-2 border rounded">
+                        <option value="lesson1">บทที่ 1</option>
+                        <option value="lesson2">บทที่ 2</option>
+                        <option value="lesson3">บทที่ 3</option>
+                    </select>
+                    
+                    <div class="text-xs text-gray-500">
+                        ใส่ข้อความ HTML หรือโค้ด Embed จาก Canva / YouTube ได้ที่ช่องด้านล่าง
+                    </div>
+                    <textarea id="editContent" rows="10" class="w-full p-2 border rounded font-mono text-sm" placeholder="<p>เนื้อหา...</p> หรือ <iframe src='...'></iframe>"></textarea>
+                    
+                    <input type="hidden" id="editId"> <div class="flex gap-2">
+                        <button onclick="saveLessonToDB()" class="flex-1 bg-blue-600 text-white py-2 rounded">บันทึกข้อมูล</button>
+                        <button onclick="deleteLesson()" class="bg-red-500 text-white px-4 rounded">ลบ</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="L1-HW" class="content-box"><h3>Hardware</h3><p>ส่วนประกอบของเครื่องที่จับต้องได้ เช่น CPU, RAM</p></div>
-        <div id="L1-SW" class="content-box"><h3>Software</h3><p>ชุดคำสั่งหรือโปรแกรมที่สั่งให้ฮาร์ดแวร์ทำงาน</p></div>
-        <div id="L1-PP" class="content-box"><h3>People</h3><p>ผู้ใช้งาน หรือบุคลากรทางคอมพิวเตอร์</p></div>
-        <div id="L1-DT" class="content-box"><h3>Data</h3><p>ข้อมูลดิบและสารสนเทศ</p></div>
-        <div id="L1-PC" class="content-box"><h3>Process</h3><p>ขั้นตอนการทำงาน (รับเข้า > ประมวลผล > แสดงผล)</p></div>
-
-        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="startQuiz(1)">ทำแบบทดสอบย่อย บทที่ 1</button>
-        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="backToMenu()">กลับหน้าหลัก</button>
-    </div>
-
-    <div id="lesson2Section" class="hidden">
-        <div class="lesson-header">
-            <h2>บทที่ 2: ประเภทคอมพิวเตอร์และการแก้ปัญหา</h2>
-        </div>
-        <div class="grid-menu">
-            <button class="btn btn-outline" onclick="showContent('L2-SP')">Super Computer</button>
-            <button class="btn btn-outline" onclick="showContent('L2-MF')">Mainframe</button>
-            <button class="btn btn-outline" onclick="showContent('L2-WS')">Workstation</button>
-            <button class="btn btn-outline" onclick="showContent('L2-PC')">PC</button>
-            <button class="btn btn-outline" onclick="showContent('L2-WR')">Wearable</button>
-        </div>
-        <div id="L2-SP" class="content-box"><h3>Super Computer</h3><p>คอมพิวเตอร์ประสิทธิภาพสูง ใช้พยากรณ์อากาศ</p></div>
-        <div id="L2-MF" class="content-box"><h3>Mainframe</h3><p>คอมพิวเตอร์ขนาดใหญ่ ใช้ในธนาคาร</p></div>
-        <div id="L2-WS" class="content-box"><h3>Workstation</h3><p>ใช้สำหรับงานกราฟิกและวิศวกรรม</p></div>
-        <div id="L2-PC" class="content-box"><h3>Personal Computer</h3><p>ใช้งานทั่วไป</p></div>
-        <div id="L2-WR" class="content-box"><h3>Wearable</h3><p>อุปกรณ์สวมใส่ เช่น Smart Watch</p></div>
-
-        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="startQuiz(2)">ทำแบบทดสอบย่อย บทที่ 2</button>
-        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="backToMenu()">กลับหน้าหลัก</button>
-    </div>
-
-    <div id="lesson3Section" class="hidden">
-        <div class="lesson-header">
-            <h2>บทที่ 3: เทคโนโลยีการสื่อสาร</h2>
-        </div>
-        <div class="grid-menu">
-            <button class="btn btn-outline" onclick="showContent('L3-SD')">ผู้ส่ง</button>
-            <button class="btn btn-outline" onclick="showContent('L3-RC')">ผู้รับ</button>
-            <button class="btn btn-outline" onclick="showContent('L3-MS')">ข่าวสาร</button>
-            <button class="btn btn-outline" onclick="showContent('L3-MD')">สื่อกลาง</button>
-            <button class="btn btn-outline" onclick="showContent('L3-PT')">โพรโตคอล</button>
-        </div>
-        <div id="L3-SD" class="content-box"><h3>ผู้ส่ง (Sender)</h3><p>ผู้เริ่มต้นส่งข้อมูล</p></div>
-        <div id="L3-RC" class="content-box"><h3>ผู้รับ (Receiver)</h3><p>ปลายทางที่รับข้อมูล</p></div>
-        <div id="L3-MS" class="content-box"><h3>ข่าวสาร (Message)</h3><p>ข้อมูลที่ต้องการส่ง</p></div>
-        <div id="L3-MD" class="content-box"><h3>สื่อกลาง (Medium)</h3><p>ตัวกลาง เช่น สาย LAN, Wi-Fi</p></div>
-        <div id="L3-PT" class="content-box"><h3>โพรโตคอล (Protocol)</h3><p>กฎกติกาในการสื่อสาร</p></div>
-
-        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="startQuiz(3)">ทำแบบทดสอบหลังเรียน</button>
-        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="backToMenu()">กลับหน้าหลัก</button>
-    </div>
-
-    <div id="quizContainer" class="hidden quiz-box">
-        <h2 id="quizTitle">แบบทดสอบ</h2>
-        <div id="quizQuestions"></div>
-        <button class="btn" onclick="submitQuiz()">ส่งคำตอบ</button>
     </div>
 
 </div>
 
 <script>
-    // 1. ตัวแปร Global
-    let studentInfo = {};
-    let currentLesson = 0;
-    let startTime;
-    let scores = { 1: 0, 2: 0, 3: 0 };
-    
-    // เปลี่ยนชื่อตัวแปรเป็น mySupabase เพื่อป้องกันการชนกันกับตัวแปรอื่นในระบบ
-    let mySupabase = null;
-
-    // 2. ตั้งค่า Supabase
+    // --- ตั้งค่า Supabase ---
+    // ใส่ URL และ Key ของคุณที่นี่
     const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // --- ส่วนเชื่อมต่อ Supabase ---
-    try {
-        if (window.supabase) {
-            // ใช้ window.supabase.createClient สร้างการเชื่อมต่อ
-            mySupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log("✅ Supabase Connected Successfully");
-        } else {
-            console.error("❌ ไม่พบ Library Supabase");
-        }
-    } catch (err) {
-        console.error("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ:", err);
-    }
+    // Global Variables
+    let currentUser = null;
+    let allLessons = [];
 
-    // --- ฟังก์ชัน 1: เริ่มต้นระบบ ---
-    function startSystem() {
-        console.log("Start System Pressed"); // เช็คการทำงานปุ่ม
+    // --- ส่วน Authentication ---
+    async function handleLogin() {
+        const name = document.getElementById('stdName').value.trim();
+        const sClass = document.getElementById('stdClass').value.trim();
+        const code = document.getElementById('stdNumber').value.trim();
 
-        // รับค่า
-        const name = document.getElementById('stdName').value;
-        const sClass = document.getElementById('stdClass').value;
-        const num = document.getElementById('stdNumber').value;
+        if (!name || !code) return alert("กรุณากรอกข้อมูล");
 
-        // ตรวจสอบ
-        if(!name || !sClass || !num) { 
-            alert("กรุณากรอกข้อมูลให้ครบ"); 
-            return; 
-        }
-
-        // บันทึก
-        studentInfo = { name, class: sClass, number: num };
-        startTime = new Date();
-
-        // เปลี่ยนหน้า
-        document.getElementById('welcomeText').innerText = `สวัสดี: ${name} (${sClass})`;
-        document.getElementById('loginSection').classList.add('hidden');
-        document.getElementById('menuSection').classList.remove('hidden');
-
-        // จับเวลา
-        setInterval(() => {
-            const now = new Date();
-            const diff = Math.floor((now - startTime) / 1000);
-            const m = Math.floor(diff / 60).toString().padStart(2, '0');
-            const s = (diff % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').innerText = `เวลาเรียน: ${m}:${s}`;
-        }, 1000);
-    }
-
-    // --- ฟังก์ชันนำทาง ---
-    function goToLesson(num) {
-        document.getElementById('menuSection').classList.add('hidden');
-        document.getElementById(`lesson${num}Section`).classList.remove('hidden');
-        currentLesson = num;
-        document.querySelectorAll('.content-box').forEach(el => el.style.display = 'none');
-        document.getElementById('quizContainer').classList.add('hidden');
-    }
-
-    function backToMenu() {
-        document.getElementById(`lesson${currentLesson}Section`).classList.add('hidden');
-        document.getElementById('menuSection').classList.remove('hidden');
-    }
-
-    function showContent(id) {
-        document.querySelectorAll(`#lesson${currentLesson}Section .content-box`).forEach(el => el.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-    }
-
-    // --- ฐานข้อมูลข้อสอบ ---
-    const questionsDB = {
-        1: [ { q: "ข้อใดไม่ใช่ฮาร์ดแวร์?", choices: ["เมาส์", "วินโดวส์", "จอภาพ", "แรม"], ans: 1 }, { q: "ส่วนใดเปรียบเสมือนสมองของคอมพิวเตอร์?", choices: ["Harddisk", "RAM", "CPU", "Monitor"], ans: 2 } ],
-        2: [ { q: "คอมพิวเตอร์ชนิดใดใช้พยากรณ์อากาศ?", choices: ["PC", "Super Computer", "Wearable", "Workstation"], ans: 1 }, { q: "ข้อใดคือการบำรุงรักษาที่ผิด?", choices: ["ไม่กินขนมหน้าคอม", "เช็ดจอด้วยผ้าแห้ง", "ฉีดน้ำใส่คีย์บอร์ด", "ปิดเครื่องก่อนทำความสะอาด"], ans: 2 } ],
-        3: [ { q: "ข้อใดคือสื่อกลางไร้สาย?", choices: ["สาย LAN", "Wi-Fi", "สาย Fiber Optic", "สาย USB"], ans: 1 }, { q: "Protocol คืออะไร?", choices: ["ผู้ส่ง", "ผู้รับ", "กฎการสื่อสาร", "ตัวกลาง"], ans: 2 } ]
-    };
-
-    function startQuiz(lessonId) {
-        const quizDiv = document.getElementById('quizQuestions');
-        quizDiv.innerHTML = "";
-        document.getElementById('quizTitle').innerText = `แบบทดสอบบทที่ ${lessonId}`;
-        questionsDB[lessonId].forEach((item, index) => {
-            let html = `<div class="question"><p>${index+1}. ${item.q}</p>`;
-            item.choices.forEach((choice, cIndex) => {
-                html += `<label style="margin-right:15px;"><input type="radio" name="q${index}" value="${cIndex}"> ${choice}</label>`;
-            });
-            html += `</div>`;
-            quizDiv.innerHTML += html;
-        });
-        document.getElementById('quizContainer').classList.remove('hidden');
-        document.getElementById('quizContainer').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function submitQuiz() {
-        let score = 0;
-        const qSet = questionsDB[currentLesson];
-        let allAnswered = true;
-        qSet.forEach((item, index) => {
-            const checked = document.querySelector(`input[name="q${index}"]:checked`);
-            if(!checked) allAnswered = false;
-            else if(parseInt(checked.value) === item.ans) score++;
-        });
-
-        if(!allAnswered) { alert("กรุณาทำข้อสอบให้ครบทุกข้อ"); return; }
-        scores[currentLesson] = score;
-        alert(`บันทึกคะแนนบทที่ ${currentLesson} เรียบร้อย! คุณได้ ${score}/${qSet.length} คะแนน`);
-        document.getElementById('quizContainer').classList.add('hidden');
-        backToMenu();
-    }
-
-    // --- ฟังก์ชันจบการทำงาน (ส่งข้อมูล) ---
-    async function finishAll() {
-        if (!mySupabase) {
-            alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (ลอง Refresh หน้าเว็บใหม่)");
+        // ตรวจสอบ Admin
+        if (name.toLowerCase() === 'admin' && code === '1234') { // รหัสผ่าน Admin
+            currentUser = { role: 'admin', name: 'Administrator' };
+            switchPage('adminDashboard');
+            fetchLessonsForAdmin();
             return;
         }
 
-        const btn = document.querySelector('#menuSection button.btn-outline');
-        btn.innerText = "กำลังบันทึกข้อมูล...";
-        btn.disabled = true;
+        // Login นักเรียน (บันทึกลง DB ถ้าไม่มีอยู่ก่อน)
+        // เช็คว่ามี user นี้ไหม
+        let { data: existingUser, error } = await supabase
+            .from('student_progress')
+            .select('*')
+            .eq('student_name', name)
+            .eq('student_number', code)
+            .single();
 
-        const durationSec = Math.floor((new Date() - startTime) / 1000);
-        const durationText = Math.floor(durationSec / 60) + " นาที " + (durationSec % 60) + " วินาที";
-
-        // ใช้ mySupabase ในการส่งข้อมูล
-        const { data, error } = await mySupabase
-            .from('student_logs')
-            .insert([{
-                student_name: studentInfo.name,
-                student_class: studentInfo.class,
-                student_number: studentInfo.number,
-                score_lesson1: scores[1],
-                score_lesson2: scores[2],
-                score_lesson3: scores[3],
-                duration_text: durationText
-            }]);
-
-        if(error) {
-            console.error(error);
-            alert("เกิดข้อผิดพลาด: " + error.message);
-            btn.disabled = false;
-            btn.innerText = "ลองส่งใหม่อีกครั้ง";
+        if (!existingUser) {
+            // สร้าง user ใหม่
+            const { data: newUser, error: createError } = await supabase
+                .from('student_progress')
+                .insert([{ student_name: name, student_class: sClass, student_number: code }])
+                .select()
+                .single();
+            
+            if (createError) return alert("Error creating user: " + createError.message);
+            currentUser = newUser;
         } else {
-            alert("✅ บันทึกข้อมูลสำเร็จ! ขอบคุณที่ตั้งใจเรียน");
-            location.reload(); 
+            currentUser = existingUser;
+            // อัปเดตเวลา login ล่าสุด
+            await supabase.from('student_progress').update({ last_login: new Date() }).eq('id', currentUser.id);
+        }
+
+        currentUser.role = 'student';
+        document.getElementById('userDisplay').innerText = `${currentUser.student_name} (${currentUser.student_class})`;
+        document.getElementById('userInfo').classList.remove('hidden');
+        switchPage('studentDashboard');
+    }
+
+    function logout() {
+        location.reload();
+    }
+
+    function switchPage(pageId) {
+        ['loginSection', 'studentDashboard', 'adminDashboard'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(pageId).classList.remove('hidden');
+    }
+
+    // --- ส่วนนักเรียน (Student Logic) ---
+    async function loadLessonGroup(category) {
+        // ดึงบทเรียนจาก DB ตามหมวดหมู่
+        const { data, error } = await supabase
+            .from('lessons')
+            .select('*')
+            .eq('category', category)
+            .order('order_index', { ascending: true });
+
+        if (error) return alert("โหลดข้อมูลไม่สำเร็จ");
+
+        document.getElementById('studentDashboard').children[0].classList.add('hidden'); // ซ่อนเมนูหลัก
+        document.getElementById('contentArea').classList.remove('hidden');
+        
+        const menuContainer = document.getElementById('subTopicMenu');
+        menuContainer.innerHTML = '';
+        document.getElementById('lessonTitle').innerText = categoryToThai(category);
+        document.getElementById('lessonViewer').innerHTML = '<p class="text-center text-gray-400 mt-10">เลือกหัวข้อด้านบนเพื่อเริ่มศึกษา</p>';
+
+        data.forEach((lesson, index) => {
+            const btn = document.createElement('button');
+            btn.className = "px-4 py-2 bg-white border border-blue-300 text-blue-600 rounded-full hover:bg-blue-50 transition";
+            btn.innerText = `${index+1}. ${lesson.title}`;
+            btn.onclick = () => showLessonContent(lesson);
+            menuContainer.appendChild(btn);
+        });
+    }
+
+    function showLessonContent(lesson) {
+        const viewer = document.getElementById('lessonViewer');
+        viewer.innerHTML = `
+            <h3 class="text-2xl font-bold mb-4 border-b pb-2">${lesson.title}</h3>
+            <div class="prose max-w-none">
+                ${lesson.content} 
+            </div>
+        `;
+        // ตรงนี้สามารถเพิ่มโค้ดบันทึกว่า "อ่านแล้ว" ลงใน DB ได้
+    }
+
+    function backToDash() {
+        document.getElementById('contentArea').classList.add('hidden');
+        document.getElementById('studentDashboard').children[0].classList.remove('hidden');
+    }
+
+    function categoryToThai(cat) {
+        const map = { 'lesson1': 'บทที่ 1: องค์ประกอบคอมฯ', 'lesson2': 'บทที่ 2: การแก้ปัญหา', 'lesson3': 'บทที่ 3: สื่อสารข้อมูล' };
+        return map[cat] || cat;
+    }
+
+    // --- ส่วนผู้ดูแลระบบ (Admin Logic / CMS) ---
+    async function fetchLessonsForAdmin() {
+        const { data, error } = await supabase.from('lessons').select('*').order('category').order('order_index');
+        if (data) {
+            allLessons = data;
+            renderAdminList();
         }
     }
+
+    function renderAdminList() {
+        const list = document.getElementById('adminLessonList');
+        list.innerHTML = '';
+        allLessons.forEach(l => {
+            const item = document.createElement('div');
+            item.className = "p-2 border rounded cursor-pointer hover:bg-gray-50 flex justify-between";
+            item.innerHTML = `<span class="text-sm font-bold">[${l.category}]</span> <span class="truncate ml-2">${l.title}</span>`;
+            item.onclick = () => loadIntoEditor(l);
+            list.appendChild(item);
+        });
+    }
+
+    function loadIntoEditor(lesson) {
+        document.getElementById('editId').value = lesson.id;
+        document.getElementById('editTitle').value = lesson.title;
+        document.getElementById('editCategory').value = lesson.category;
+        document.getElementById('editContent').value = lesson.content;
+    }
+
+    function prepareNewLesson() {
+        document.getElementById('editId').value = '';
+        document.getElementById('editTitle').value = '';
+        document.getElementById('editContent').value = '';
+        document.getElementById('editTitle').focus();
+    }
+
+    async function saveLessonToDB() {
+        const id = document.getElementById('editId').value;
+        const title = document.getElementById('editTitle').value;
+        const category = document.getElementById('editCategory').value;
+        const content = document.getElementById('editContent').value;
+
+        if (!title) return alert("กรุณาใส่หัวข้อ");
+
+        const payload = { title, content, category, order_index: Date.now() }; // ใช้ timestamp เป็นตัวเรียงลำดับง่ายๆ
+
+        let error;
+        if (id) {
+            // Update
+            const res = await supabase.from('lessons').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            // Insert
+            const res = await supabase.from('lessons').insert([payload]);
+            error = res.error;
+        }
+
+        if (error) alert("Error: " + error.message);
+        else {
+            alert("บันทึกสำเร็จ!");
+            fetchLessonsForAdmin(); // Refresh list
+            prepareNewLesson();
+        }
+    }
+
+    async function deleteLesson() {
+        const id = document.getElementById('editId').value;
+        if (!id) return;
+        if (!confirm("ยืนยันที่จะลบหัวข้อนี้?")) return;
+
+        const { error } = await supabase.from('lessons').delete().eq('id', id);
+        if (!error) {
+            alert("ลบเรียบร้อย");
+            fetchLessonsForAdmin();
+            prepareNewLesson();
+        }
+    }
+
 </script>
 </body>
 </html>
