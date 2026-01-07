@@ -295,7 +295,13 @@
         // Stop previous timer if any
         stopLessonTimer(); 
 
+        // --- เพิ่มบรรทัดนี้: ล้างของเก่าทิ้งก่อนโหลดของใหม่ ---
+        document.getElementById('lessonViewer').innerHTML = '';
+        // ---------------------------------------------
+
         currentLessonId = lesson.id;
+        
+        // โหลดเนื้อหาใหม่เข้าไป
         document.getElementById('lessonViewer').innerHTML = `
             <h3 style="border-bottom:1px solid #ddd; padding-bottom:10px;">${lesson.title}</h3>
             <div>${lesson.content}</div>
@@ -311,10 +317,9 @@
             document.getElementById('timerDisplay').innerText = `⏱ ${mins}:${secs}`;
         }, 1000);
 
-        // Mark as completed immediately (or you can do it after X seconds)
+        // Mark as completed
         if (!currentUser.completed_lessons.includes(lesson.id)) {
             currentUser.completed_lessons.push(lesson.id);
-            // Save completion status
             dbClient.from('student_progress').update({ 
                 completed_lessons: currentUser.completed_lessons 
             }).eq('id', currentUser.id).then(() => {});
@@ -343,10 +348,15 @@
     }
 
     function backToDash() {
-        stopLessonTimer(); // Save data
+        stopLessonTimer(); // บันทึกเวลา
+        
+        // --- เพิ่มบรรทัดนี้: ล้างเนื้อหา Iframe ทิ้งทันที เพื่อไม่ให้ Canva ค้าง ---
+        document.getElementById('lessonViewer').innerHTML = ''; 
+        // -----------------------------------------------------------------
+
         document.getElementById('contentArea').classList.add('hidden');
         document.getElementById('mainMenu').classList.remove('hidden');
-        updateStudentMenuProgress(); // Refresh badges
+        updateStudentMenuProgress(); 
     }
 
     function updateStudentMenuProgress() {
