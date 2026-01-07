@@ -257,16 +257,17 @@
 </div>
 
 <script>
-    // --- 1. ตั้งค่า Supabase ---
-    const SUPABASE_URL = 'ใส่ URL ของคุณที่นี่'; 
-    const SUPABASE_KEY = 'ใส่ KEY ของคุณที่นี่'; 
-    
-    // เปลี่ยนชื่อตัวแปรเป็น dbClient เพื่อแก้ปัญหาชื่อซ้ำ
+    // --- 1. ตั้งค่า Supabase (ใส่ข้อมูลของคุณให้แล้ว) ---
+    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E'; 
+
+    // สร้าง Client (ใช้ชื่อตัวแปร dbClient เพื่อป้องกันชื่อซ้ำ)
     let dbClient; 
     try {
         dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("✅ Supabase Connected");
     } catch (e) {
-        console.error("Supabase connect error", e);
+        console.error("❌ Supabase connect error", e);
     }
 
     let currentUser = null;
@@ -274,6 +275,8 @@
 
     // --- 2. ฟังก์ชัน Login ---
     async function handleLogin() {
+        if (!dbClient) return alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้ กรุณารีเฟรชหน้าเว็บ");
+
         const name = document.getElementById('stdName').value.trim();
         const sClass = document.getElementById('stdClass').value.trim();
         const code = document.getElementById('stdNumber').value.trim();
@@ -288,7 +291,7 @@
             return;
         }
 
-        // Student Login (ใช้ dbClient แทน supabase)
+        // Student Login
         const { data: existingUser, error } = await dbClient
             .from('student_progress')
             .select('*')
@@ -330,7 +333,6 @@
 
     // --- 3. ส่วนนักเรียน (Student) ---
     async function loadLessonGroup(category) {
-        // ใช้ dbClient
         const { data, error } = await dbClient
             .from('lessons')
             .select('*')
@@ -360,7 +362,7 @@
                 menuContainer.appendChild(btn);
             });
         } else {
-            menuContainer.innerHTML = '<p style="color:red">ยังไม่มีบทเรียนในหมวดนี้</p>';
+            menuContainer.innerHTML = '<p style="color:red; width:100%; text-align:center;">ยังไม่มีบทเรียนในหมวดนี้</p>';
         }
     }
 
