@@ -402,30 +402,40 @@
     }
     async function saveLessonToDB() {
         const id = document.getElementById('editId').value;
+        const title = document.getElementById('editTitle').value;
+        const category = document.getElementById('editCategory').value;
+        const content = document.getElementById('editContent').value;
+
+        if (!title) return alert("กรุณาใส่หัวข้อ");
+
+        // แก้ไขจุดที่ 1: ใช้ Math.floor(Date.now() / 1000) เพื่อลดขนาดตัวเลขลงให้ใส่ในฐานข้อมูลได้
         const payload = {
-            title: document.getElementById('editTitle').value,
-            category: document.getElementById('editCategory').value,
-            content: document.getElementById('editContent').value,
-            order_index: Date.now()
+            title: title,
+            category: category,
+            content: content,
+            order_index: Math.floor(Date.now() / 1000) 
         };
-        if(!payload.title) return alert("ใส่ชื่อหัวข้อด้วย");
-        
-        if(id) await dbClient.from('lessons').update(payload).eq('id', id);
-        else await dbClient.from('lessons').insert([payload]);
-        
-        alert("บันทึกแล้ว");
-        fetchLessonsForAdmin();
-        prepareNewLesson();
-    }
-    async function deleteLesson() {
-        const id = document.getElementById('editId').value;
-        if(id && confirm("ลบไหม?")) {
-            await dbClient.from('lessons').delete().eq('id', id);
+
+        let error;
+        if (id) {
+            // Update ข้อมูลเดิม
+            const res = await dbClient.from('lessons').update(payload).eq('id', id);
+            error = res.error;
+        } else {
+            // Insert ข้อมูลใหม่
+            const res = await dbClient.from('lessons').insert([payload]);
+            error = res.error;
+        }
+
+        if (error) {
+            console.error(error); // ดู error เต็มๆ ใน console
+            alert("บันทึกไม่ผ่าน: " + error.message);
+        } else {
+            alert("บันทึกสำเร็จ!");
             fetchLessonsForAdmin();
             prepareNewLesson();
         }
     }
-
     // --- Admin Monitor Logic ---
     async function fetchStudentMonitor() {
         const { data: students } = await dbClient.from('student_progress')
