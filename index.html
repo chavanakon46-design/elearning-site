@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRU DREAM | ห้องเรียนคอมพิวเตอร์ยุคใหม่</title>
+    <title>KRU DREAM | ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -19,268 +19,275 @@
             --radius: 20px; --shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
 
-        body { 
-            font-family: 'Sarabun', sans-serif; background: var(--bg); 
-            color: var(--text); margin: 0; min-height: 100vh;
-        }
-
-        /* Glassmorphism Design */
+        body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        
         .glass-nav {
             background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
             padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.3); display: flex;
-            justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        .card {
-            background: white; border-radius: var(--radius); padding: 2rem;
-            box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-
-        /* Login Styling from Image */
-        .login-container {
-            max-width: 500px; margin: 5rem auto; text-align: center;
-        }
-
-        .tab-group {
-            background: #f1f5f9; padding: 0.5rem; border-radius: 15px;
-            display: flex; gap: 0.5rem; margin-bottom: 2rem;
-        }
-
-        .tab-btn {
-            flex: 1; padding: 0.8rem; border: none; border-radius: 10px;
-            cursor: pointer; font-weight: 600; transition: 0.3s; background: transparent;
-        }
-
-        .tab-btn.active { background: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); color: var(--primary); }
-
-        /* Timer & Badge */
-        .timer-display {
-            background: #1e293b; color: #10b981; padding: 0.5rem 1.5rem;
-            border-radius: 50px; font-family: monospace; font-size: 1.5rem; font-weight: bold;
-        }
-
-        .lesson-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem; margin-top: 2rem;
-        }
-
-        .lesson-card {
-            cursor: pointer; position: relative; overflow: hidden; height: 160px;
-        }
-
-        .lesson-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-
+        .card { background: white; border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); transition: 0.3s; }
         .btn-main {
             background: var(--primary); color: white; border: none; padding: 1rem 2rem;
-            border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;
-            transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+            border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 0.5rem;
         }
+        .btn-main:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
-        .btn-main:hover { opacity: 0.9; transform: scale(1.02); }
+        .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .lesson-card { cursor: pointer; position: relative; overflow: hidden; height: 160px; border: 2px solid transparent; }
+        .lesson-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .lesson-num { position: absolute; right: -10px; top: -10px; font-size: 6rem; font-weight: 900; color: #f1f5f9; z-index: 0; }
 
+        .timer-badge { background: #1e293b; color: #10b981; padding: 0.5rem 1.5rem; border-radius: 50px; font-family: monospace; font-size: 1.5rem; }
         .hidden { display: none !important; }
+        
+        /* Stats Styles */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 2rem; }
+        .stat-box { text-align: center; padding: 1.5rem; border-bottom: 4px solid var(--primary); }
     </style>
 </head>
 <body>
 
     <nav class="glass-nav">
-        <div style="display:flex; align-items:center; gap:0.8rem; font-weight:800; color:var(--primary); font-size:1.5rem;">
-            <i class="ph-fill ph-rocket-launch"></i> KRU DREAM
+        <div style="font-weight:800; color:var(--primary); font-size:1.5rem; display:flex; align-items:center; gap:10px;">
+            <i class="ph-fill ph-cpu"></i> KRU DREAM
         </div>
-        <div id="userInfo" class="hidden" style="display:flex; align-items:center; gap:1.5rem;">
-            <span id="displayUserName" style="font-weight:600;"></span>
-            <button onclick="handleLogout()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">
-                <i class="ph ph-sign-out"></i> ออกจากระบบ
-            </button>
+        <div id="authInfo" class="hidden" style="display:flex; align-items:center; gap:1.5rem;">
+            <span id="navUserName" style="font-weight:600;"></span>
+            <button onclick="location.reload()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">ออกจากระบบ</button>
         </div>
     </nav>
 
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-        
-        <div id="loginSection" class="login-container animate__animated animate__fadeInDown">
-            <div class="card">
-                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">🚀 เข้าสู่ห้องเรียนคอมพิวเตอร์</h1>
-                <p style="color: var(--secondary); margin-bottom: 2rem;">กรุณาเลือกประเภทการใช้งาน</p>
-                
-                <div class="tab-group">
-                    <button id="btnTabStd" class="tab-btn active" onclick="switchTab('std')">นักเรียน</button>
-                    <button id="btnTabTea" class="tab-btn" onclick="switchTab('tea')">คุณครู</button>
+    <div class="container">
+        <div id="sectionLogin" class="animate__animated animate__fadeInDown" style="max-width:450px; margin: 4rem auto;">
+            <div class="card" style="text-align:center;">
+                <h2>🚀 เข้าสู่ห้องเรียน</h2>
+                <div style="display:flex; gap:10px; background:#f1f5f9; padding:5px; border-radius:12px; margin-bottom:2rem;">
+                    <button class="btn-main" style="flex:1" id="tabStd" onclick="switchLogin('std')">นักเรียน</button>
+                    <button class="btn-main" style="flex:1; background:none; color:var(--text);" id="tabTea" onclick="switchLogin('tea')">คุณครู</button>
                 </div>
-
-                <div id="formStd">
-                    <input type="text" id="stdCodeInput" placeholder="กรอกรหัส 5 หลักของคุณ" maxlength="5" 
-                           style="width:100%; padding:1.2rem; border-radius:12px; border:2px solid #e2e8f0; text-align:center; font-size:1.5rem; margin-bottom:1.5rem;">
-                    <button onclick="loginStudent()" class="btn-main">เข้าเรียนเลย <i class="ph ph-caret-right"></i></button>
+                <div id="loginStd">
+                    <input type="text" id="inputStdCode" placeholder="รหัส 5 หลัก" maxlength="5" style="width:100%; padding:1rem; text-align:center; font-size:1.5rem; border:2px solid #e2e8f0; border-radius:12px; margin-bottom:1.5rem;">
+                    <button onclick="loginStudent()" class="btn-main" style="width:100%">เข้าเรียน</button>
                 </div>
-
-                <div id="formTea" class="hidden">
-                    <input type="password" id="teaPassInput" placeholder="รหัสผ่านผู้จัดการระบบ" 
-                           style="width:100%; padding:1.2rem; border-radius:12px; border:2px solid #e2e8f0; text-align:center; margin-bottom:1.5rem;">
-                    <button onclick="loginTeacher()" class="btn-main">เข้าสู่ระบบครู <i class="ph ph-shield-check"></i></button>
+                <div id="loginTea" class="hidden">
+                    <input type="password" id="inputTeaPass" placeholder="รหัสผ่านครู" style="width:100%; padding:1rem; text-align:center; border:2px solid #e2e8f0; border-radius:12px; margin-bottom:1.5rem;">
+                    <button onclick="loginTeacher()" class="btn-main" style="width:100%">เข้าระบบครู</button>
                 </div>
             </div>
         </div>
 
-        <div id="studentDashboard" class="hidden animate__animated animate__fadeIn">
-            <div class="card" style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(to right, #ffffff, #f0f9ff);">
+        <div id="sectionStudent" class="hidden animate__animated animate__fadeIn">
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
                 <div>
-                    <h2 style="margin:0;">ยินดีต้อนรับ, <span id="stdName" style="color:var(--primary);">...</span> 👋</h2>
-                    <p style="margin:0.5rem 0 0 0; color:var(--secondary);">เวลาเรียนสะสม: <b id="totalStudyTime">0</b> นาที</p>
+                    <h2 style="margin:0;">สวัสดี, <span id="stdName" style="color:var(--primary);">...</span></h2>
+                    <p style="margin:5px 0 0 0; color:var(--secondary);">เวลาเรียนรวม: <b id="totalTime">0</b> นาที</p>
                 </div>
-                <button class="tab-btn active" onclick="showHistory()" style="flex:none; padding: 0.8rem 1.5rem;">
-                    <i class="ph ph-clock-counter-clockwise"></i> ประวัติการเรียน
-                </button>
+                <button onclick="showProfile()" class="btn-main" style="background:var(--secondary);">ดูประวัติคะแนน</button>
             </div>
+            <div id="lessonGrid" class="lesson-grid"></div>
 
-            <div id="lessonList" class="lesson-grid"></div>
+            <div id="viewer" class="hidden animate__animated animate__zoomIn">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h2 id="viewTitle" style="margin:0;"></h2>
+                        <div class="timer-badge" id="liveClock">00:00</div>
+                    </div>
+                    <div id="viewContent" style="min-height:300px; padding:1rem; background:#f8fafc; border-radius:15px;"></div>
+                    <div id="viewQuiz" class="hidden"></div>
+                    <div style="display:flex; gap:1rem; margin-top:2rem;">
+                        <button id="btnQuiz" onclick="renderQuiz()" class="btn-main" style="flex:1;">ทำแบบทดสอบ</button>
+                        <button onclick="closeLesson()" class="btn-main" style="flex:1; background:var(--secondary);">กลับหน้าหลัก</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="lessonViewer" class="hidden animate__animated animate__zoomIn">
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-                    <h2 id="lessonTitle" style="margin:0; color:var(--primary);">...</h2>
-                    <div class="timer-display" id="activeTimer">00:00</div>
+        <div id="sectionTeacher" class="hidden">
+            <div style="display:flex; gap:1rem; margin-bottom:2rem;">
+                <button class="btn-main" onclick="loadAdminStats()">📊 ภาพรวม</button>
+                <button class="btn-main" onclick="loadMonitor()" style="background:var(--secondary);">👀 ติดตามรายคน</button>
+            </div>
+            <div id="admStat" class="adm-content">
+                <div class="stats-grid">
+                    <div class="card stat-box"><div class="stat-val" id="countS">0</div>นักเรียน</div>
+                    <div class="card stat-box"><div class="stat-val" id="countP">0%</div>ผ่านเกณฑ์</div>
                 </div>
-                <div id="contentArea" style="min-height: 400px; background: #f8fafc; border-radius: 15px; padding: 2rem;">
-                    </div>
-                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                    <button id="quizBtn" onclick="startQuiz()" class="btn-main" style="flex:1;">ทำแบบทดสอบ</button>
-                    <button onclick="exitLesson()" class="btn-main" style="flex:1; background:var(--secondary);">กลับหน้าหลัก</button>
+                <div class="card"><canvas id="statChart" style="max-height:300px;"></canvas></div>
+            </div>
+            <div id="admMonitor" class="adm-content hidden">
+                <div class="card">
+                    <table style="width:100%;">
+                        <thead><tr><th>นักเรียน</th><th>เวลาเรียน</th><th>คะแนน</th></tr></thead>
+                        <tbody id="monitorBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Supabase Configuration
-        const _URL = 'https://fddkpkcmkvitjkouxerg.supabase.co';
-        const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E';
-        const sb = window.supabase.createClient(_URL, _KEY);
+<script>
+    const _URL = 'https://fddkpkcmkvitjkouxerg.supabase.co';
+    const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E';
+    const sb = window.supabase.createClient(_URL, _KEY);
 
-        let userSession = null;
-        let studyClock = null;
-        let elapsedSecs = 0;
-        let currentUnitKey = '';
+    let user = null; let studySecs = 0; let studyInterval; let currentUnitKey = '';
 
-        const UNITS = {
-            'unit1': 'หน่วยที่ 1: ระบบคอมพิวเตอร์',
-            'unit2': 'หน่วยที่ 2: หลักการทำงาน',
-            'unit3': 'หน่วยที่ 3: เครือข่ายการสื่อสาร',
-            'unit4': 'หน่วยที่ 4: อินเทอร์เน็ต'
-        };
+    const UNITS = { 'unit1':'1. องค์ประกอบคอมพิวเตอร์', 'unit2':'2. หลักการทำงาน', 'unit3':'3. เครือข่ายสื่อสาร', 'unit4':'4. อินเทอร์เน็ต' };
 
-        // UI Helpers
-        function switchTab(type) {
-            document.getElementById('btnTabStd').classList.toggle('active', type === 'std');
-            document.getElementById('btnTabTea').classList.toggle('active', type === 'tea');
-            document.getElementById('formStd').classList.toggle('hidden', type === 'tea');
-            document.getElementById('formTea').classList.toggle('hidden', type === 'std');
+    function switchLogin(t) {
+        document.getElementById('loginStd').classList.toggle('hidden', t==='tea');
+        document.getElementById('loginTea').classList.toggle('hidden', t==='std');
+        document.getElementById('tabStd').style.background = t==='std' ? 'var(--primary)' : 'none';
+        document.getElementById('tabTea').style.background = t==='tea' ? 'var(--primary)' : 'none';
+    }
+
+    async function loginStudent() {
+        const code = document.getElementById('inputStdCode').value;
+        const { data, error } = await sb.from('student_progress').select('*').eq('student_code', code).single();
+        if(error || !data) return Swal.fire('ไม่พบรหัส!', 'กรุณาตรวจสอบรหัสอีกครั้ง', 'error');
+        
+        user = data;
+        document.getElementById('sectionLogin').classList.add('hidden');
+        document.getElementById('sectionStudent').classList.remove('hidden');
+        document.getElementById('authInfo').classList.remove('hidden');
+        document.getElementById('navUserName').innerText = `นักเรียน: ${data.student_name}`;
+        document.getElementById('stdName').innerText = data.student_name;
+        
+        updateTimeUI(data.study_time); renderLessons();
+        Swal.fire('สำเร็จ!', `ยินดีต้อนรับ น้อง${data.student_name}`, 'success');
+    }
+
+    function loginTeacher() {
+        if(document.getElementById('inputTeaPass').value === '1234') {
+            document.getElementById('sectionLogin').classList.add('hidden');
+            document.getElementById('sectionTeacher').classList.remove('hidden');
+            loadAdminStats();
+        } else Swal.fire('รหัสผ่านผิด!', '', 'error');
+    }
+
+    async function renderLessons() {
+        const { data: lessons } = await sb.from('lessons').select('*');
+        const grid = document.getElementById('lessonGrid'); grid.innerHTML = '';
+        Object.keys(UNITS).forEach((key, i) => {
+            const lesson = lessons?.find(l => l.category === key);
+            grid.innerHTML += `<div class="card lesson-card animate__animated animate__fadeInUp" onclick="openLesson('${key}')">
+                <div class="lesson-num">${i+1}</div>
+                <div style="position:relative; z-index:1;">
+                    <h3 style="margin:0; color:${lesson?'var(--primary)':'#ccc'}">${UNITS[key]}</h3>
+                    <small>${lesson?'✅ เข้าเรียนได้':'⚪ รอเนื้อหา'}</small>
+                </div>
+            </div>`;
+        });
+    }
+
+    async function openLesson(key) {
+        const { data } = await sb.from('lessons').select('*').eq('category', key).single();
+        if(!data) return Swal.fire('ยังไม่มีเนื้อหา', '', 'info');
+        
+        user.current_lesson = data; currentUnitKey = key;
+        document.getElementById('lessonGrid').classList.add('hidden');
+        document.getElementById('viewer').classList.remove('hidden');
+        document.getElementById('viewTitle').innerText = data.title;
+        document.getElementById('viewContent').innerHTML = data.content;
+        document.getElementById('viewQuiz').classList.add('hidden');
+        document.getElementById('viewContent').classList.remove('hidden');
+        document.getElementById('btnQuiz').classList.remove('hidden');
+        
+        startTimer();
+    }
+
+    function startTimer() {
+        studySecs = 0;
+        studyInterval = setInterval(() => {
+            studySecs++;
+            const m = String(Math.floor(studySecs/60)).padStart(2,'0');
+            const s = String(studySecs%60).padStart(2,'0');
+            document.getElementById('liveClock').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    async function closeLesson() {
+        clearInterval(studyInterval);
+        if(studySecs > 5) {
+            const { data } = await sb.from('student_progress').select('study_time').eq('id', user.id).single();
+            let times = data.study_time || {};
+            times[currentUnitKey] = (times[currentUnitKey] || 0) + studySecs;
+            await sb.from('student_progress').update({ study_time: times }).eq('id', user.id);
+            user.study_time = times; updateTimeUI(times);
         }
+        document.getElementById('viewer').classList.add('hidden');
+        document.getElementById('lessonGrid').classList.remove('hidden');
+    }
 
-        function showAlert(icon, title, text) {
-            Swal.fire({ icon, title, text, showConfirmButton: false, timer: 2000, borderRadius: '20px' });
-        }
+    function updateTimeUI(timeObj) {
+        const total = Object.values(timeObj || {}).reduce((a,b)=>a+(typeof b==='number'?b:0), 0);
+        document.getElementById('totalTime').innerText = Math.floor(total/60);
+    }
 
-        // Authentication
-        async function loginStudent() {
-            const code = document.getElementById('stdCodeInput').value;
-            if(code.length !== 5) return showAlert('warning', 'แจ้งเตือน', 'กรุณากรอกรหัสให้ครบ 5 หลัก');
-
-            const { data, error } = await sb.from('student_progress').select('*').eq('student_code', code).single();
-            
-            if(error || !data) return showAlert('error', 'ผิดพลาด', 'ไม่พบข้อมูลนักเรียนในระบบ');
-
-            userSession = data;
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('studentDashboard').classList.remove('hidden');
-            document.getElementById('displayUserName').innerText = `นักเรียน: ${data.student_name}`;
-            document.getElementById('stdName').innerText = data.student_name;
-            
-            updateTimeDisplay(data.study_time);
-            loadLessons();
-            showAlert('success', 'เข้าสู่ระบบสำเร็จ', `ยินดีต้อนรับ น้อง${data.student_name}`);
-        }
-
-        // Lesson Management
-        async function loadLessons() {
-            const { data: lessons } = await sb.from('lessons').select('*');
-            const list = document.getElementById('lessonList');
-            list.innerHTML = '';
-
-            Object.keys(UNITS).forEach((key, index) => {
-                const lesson = lessons?.find(l => l.category === key);
-                const card = document.createElement('div');
-                card.className = 'card lesson-card animate__animated animate__fadeInUp';
-                card.style.animationDelay = `${index * 0.1}s`;
-                card.innerHTML = `
-                    <div style="position:absolute; right:-10px; top:-10px; font-size:6rem; font-weight:900; color:#f8fafc; z-index:0;">${index+1}</div>
-                    <div style="position:relative; z-index:1;">
-                        <h3 style="margin:0; color: ${lesson ? 'var(--primary)' : '#cbd5e1'}">${UNITS[key]}</h3>
-                        <p style="margin-top:1rem; font-weight:bold; color: ${lesson ? 'var(--success)' : '#94a3b8'}">
-                            ${lesson ? '🟢 พร้อมเรียนแล้ว' : '⚪ ยังไม่มีเนื้อหา'}
-                        </p>
-                    </div>
-                `;
-                if(lesson) card.onclick = () => openLesson(lesson);
-                list.appendChild(card);
+    function renderQuiz() {
+        const quiz = user.current_lesson.quiz_data;
+        if(!quiz || quiz.length === 0) return Swal.fire('บทนี้ไม่มีข้อสอบ', '', 'info');
+        
+        document.getElementById('viewContent').classList.add('hidden');
+        document.getElementById('btnQuiz').classList.add('hidden');
+        const qv = document.getElementById('viewQuiz'); qv.classList.remove('hidden');
+        
+        let html = '<h3 style="color:var(--primary);">แบบทดสอบหลังเรียน</h3>';
+        quiz.forEach((q, i) => {
+            html += `<div style="margin-bottom:1.5rem;"><b>${i+1}. ${q.question}</b><br>`;
+            q.options.forEach((o, oi) => {
+                html += `<label style="display:block; margin:5px 0;"><input type="radio" name="q${i}" value="${oi}"> ${o}</label>`;
             });
-        }
+            html += `</div>`;
+        });
+        html += `<button onclick="submitQuiz()" class="btn-main" style="width:100%">ส่งคำตอบ</button>`;
+        qv.innerHTML = html;
+    }
 
-        function openLesson(lesson) {
-            currentUnitKey = lesson.category;
-            document.getElementById('studentDashboard').classList.add('hidden');
-            document.getElementById('lessonViewer').classList.remove('hidden');
-            document.getElementById('lessonTitle').innerText = lesson.title;
-            document.getElementById('contentArea').innerHTML = lesson.content;
-            
-            startTimer();
-        }
+    async function submitQuiz() {
+        let score = 0; const quiz = user.current_lesson.quiz_data;
+        quiz.forEach((q, i) => {
+            const sel = document.querySelector(`input[name="q${i}"]:checked`);
+            if(sel && parseInt(sel.value) === q.correct) score++;
+        });
+        const passed = (score/quiz.length) >= 0.6;
+        
+        await sb.from('quiz_results').insert([{ 
+            student_id: user.id, lesson_id: user.current_lesson.id, score, total_score: quiz.length, passed 
+        }]);
 
-        // Timer System (เชื่อมต่อภาพ image_f346fa.png)
-        function startTimer() {
-            elapsedSecs = 0;
-            studyClock = setInterval(() => {
-                elapsedSecs++;
-                const mins = String(Math.floor(elapsedSecs / 60)).padStart(2, '0');
-                const secs = String(elapsedSecs % 60).padStart(2, '0');
-                document.getElementById('activeTimer').innerText = `${mins}:${secs}`;
-            }, 1000);
-        }
+        Swal.fire({
+            title: passed ? 'สอบผ่าน!' : 'ไม่ผ่านเกณฑ์',
+            text: `คะแนนของคุณคือ ${score}/${quiz.length}`,
+            icon: passed ? 'success' : 'warning'
+        }).then(() => location.reload());
+    }
 
-        async function exitLesson() {
-            clearInterval(studyClock);
-            
-            if(elapsedSecs > 5) {
-                const { data } = await sb.from('student_progress').select('study_time').eq('id', userSession.id).single();
-                let currentTimes = data.study_time || {};
-                currentTimes[currentUnitKey] = (currentTimes[currentUnitKey] || 0) + elapsedSecs;
-                
-                await sb.from('student_progress').update({ 
-                    study_time: currentTimes,
-                    last_login: new Date().toISOString()
-                }).eq('id', userSession.id);
-                
-                userSession.study_time = currentTimes;
-                updateTimeDisplay(currentTimes);
-                showAlert('info', 'ระบบบันทึกเวลา', `บันทึกเวลาเรียนเพิ่ม ${Math.floor(elapsedSecs/60)} นาที`);
-            }
+    async function loadAdminStats() {
+        document.querySelectorAll('.adm-content').forEach(s => s.classList.add('hidden'));
+        document.getElementById('admStat').classList.remove('hidden');
+        const { data: stds } = await sb.from('student_progress').select('*');
+        const { data: res } = await sb.from('quiz_results').select('*');
+        document.getElementById('countS').innerText = stds?.length || 0;
+        const rate = res?.length ? (res.filter(r=>r.passed).length/res.length*100).toFixed(0) : 0;
+        document.getElementById('countP').innerText = rate + '%';
+    }
 
-            document.getElementById('lessonViewer').classList.add('hidden');
-            document.getElementById('studentDashboard').classList.remove('hidden');
-        }
-
-        function updateTimeDisplay(timeObj) {
-            if(!timeObj) return;
-            const totalSecs = Object.values(timeObj).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
-            document.getElementById('totalStudyTime').innerText = Math.floor(totalSecs / 60);
-        }
-
-        function handleLogout() {
-            location.reload();
-        }
-    </script>
+    async function loadMonitor() {
+        document.querySelectorAll('.adm-content').forEach(s => s.classList.add('hidden'));
+        document.getElementById('admMonitor').classList.remove('hidden');
+        const { data: stds } = await sb.from('student_progress').select('*');
+        const body = document.getElementById('monitorBody'); body.innerHTML = '';
+        stds.forEach(s => {
+            const total = Object.values(s.study_time || {}).reduce((a,b)=>a+(typeof b==='number'?b:0), 0);
+            body.innerHTML += `<tr><td><b>${s.student_name}</b></td><td>${Math.floor(total/60)} นาที</td><td>${s.completed_lessons?.length || 0} บท</td></tr>`;
+        });
+    }
+</script>
 </body>
 </html>
