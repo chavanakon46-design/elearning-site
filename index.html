@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRU DREAM: ระบบคอมพิวเตอร์ฯ (V.9.1 Fixed)</title>
+    <title>KRU DREAM: ระบบคอมพิวเตอร์ (V.10.0 M.2)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,7 +11,7 @@
 
     <style>
         :root {
-            --primary: #0284c7; /* Sky Blue */
+            --primary: #0284c7; /* สีฟ้า Sky Blue (ธีมคอมพิวเตอร์) */
             --primary-dark: #0369a1;
             --secondary: #64748b;
             --success: #10b981;
@@ -94,7 +94,7 @@
     <div id="pageLogin" class="login-wrapper">
         <div class="card login-box">
             <h2 style="color:var(--primary);">เข้าสู่ระบบห้องเรียน</h2>
-            <p style="color:var(--secondary); margin-bottom: 20px;">วิชา เทคโนโลยี (วิทยาการคำนวณ)</p>
+            <p style="color:var(--secondary); margin-bottom: 20px;">วิชา วิทยาการคำนวณ (เทคโนโลยี)</p>
             
             <div class="login-tabs">
                 <button class="tab-btn active" onclick="switchLoginTab('student')" id="tabLoginStd">👨‍🎓 นักเรียน</button>
@@ -240,7 +240,7 @@
         <h3>👤 ข้อมูลนักเรียน</h3>
         <input type="hidden" id="mStdId">
         <label>รหัสนักเรียน (5 หลัก) <span style="color:red">* ใช้ Login</span></label>
-        <input type="text" id="mStdCode" maxlength="5" style="font-size:1.2rem; font-weight:bold; color:var(--primary); text-align:center; letter-spacing:2px;">
+        <input type="text" id="mStdCode" maxlength="5">
         <label>ชื่อ-นามสกุล</label><input type="text" id="mStdName">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div><label>ระดับชั้น</label><input type="text" id="mStdClass" placeholder="ม.2/1"></div>
@@ -279,10 +279,11 @@
 
 <script>
     // --- CONFIGURATION ---
-    // ⚠️⚠️ อย่าลืมใส่ URL และ Key ของคุณที่บรรทัดนี้ ⚠️⚠️
+    // ⚠️⚠️ แก้ไขตรงนี้: ใส่ URL และ Key ของคุณ ⚠️⚠️
     const SUPABASE_URL = 'https://gruvotwrukrqwvaudaro.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydXZvdHdydWtycXd2YXVkYXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwMzk3NTksImV4cCI6MjA4NDYxNTc1OX0.GkBklU6IxxNgpCZ3FmFdnAwqPGtJLbcyZxlO5YMD3PA';
 
+    // หัวข้อ 8 บท (ตามที่คุณต้องการ)
     const UNITS = {
         'unit1': '1. องค์ประกอบของระบบคอมพิวเตอร์',
         'unit2': '2. หลักการทำงานของระบบคอมพิวเตอร์',
@@ -321,7 +322,7 @@
         if (code.length !== 5) return alert('กรุณากรอกรหัสนักเรียน 5 หลัก');
         
         const { data, error } = await sb.from('student_progress').select('*').eq('student_code', code).single();
-        if (error || !data) return alert('ไม่พบข้อมูล (แจ้งครูผู้สอน)');
+        if (error || !data) return alert('ไม่พบข้อมูลนักเรียนนี้ (กรุณาแจ้งครูผู้สอน)');
 
         user = data;
         await sb.from('student_progress').update({ last_login: new Date() }).eq('id', user.id);
@@ -421,12 +422,11 @@
     async function saveStdDB() {
         const payload = { student_code: document.getElementById('mStdCode').value, student_name: document.getElementById('mStdName').value, student_class: document.getElementById('mStdClass').value, student_number: document.getElementById('mStdNum').value };
         const id = document.getElementById('mStdId').value;
-        if(!payload.student_code || payload.student_code.length !== 5) return alert('รหัสนักเรียนต้อง 5 หลัก');
         if(id) await sb.from('student_progress').update(payload).eq('id', id);
         else await sb.from('student_progress').insert([{...payload, study_time:{}, completed_lessons:[]}]);
         closeModal('modalStd'); loadStudents();
     }
-    async function delStd(id) { if(confirm('ยืนยันลบ?')) { await sb.from('student_progress').delete().eq('id', id); loadStudents(); } }
+    async function delStd(id) { if(confirm('ลบ?')) { await sb.from('student_progress').delete().eq('id', id); loadStudents(); } }
 
     // Admin: Content
     async function loadContentList() {
@@ -460,6 +460,7 @@
         document.getElementById('quizListPreview').innerHTML = tempQuiz.map((q,i) => `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:5px; display:flex; justify-content:space-between;"><span>${i+1}. ${q.question}</span><button onclick="tempQuiz.splice(${i},1); renderQuizPreview()" class="btn btn-sm btn-danger">x</button></div>`).join('');
     }
 
+    // Quiz Modal
     function openQuizModal() { document.getElementById('mqQuestion').value=''; document.getElementById('mqOptions').innerHTML=''; addOptionInput(); addOptionInput(); document.getElementById('modalQuiz').classList.remove('hidden'); }
     function addOptionInput() { 
         const d = document.createElement('div'); d.style.display='flex'; d.style.gap='5px'; d.style.marginBottom='5px';
@@ -492,8 +493,8 @@
         const tb = document.getElementById('tbodyMonitor'); tb.innerHTML = '';
         const { data: scores } = await sb.from('quiz_results').select('*').order('created_at', {ascending:false});
         
-        (data || []).forEach(s => {
-            const lastScore = scores?.find(sc => sc.student_id === s.id);
+        data.forEach(s => {
+            const lastScore = scores.find(sc => sc.student_id === s.id);
             tb.innerHTML += `<tr>
                 <td>${s.student_name}</td>
                 <td>${s.last_login ? new Date(s.last_login).toLocaleDateString() : '-'}</td>
