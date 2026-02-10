@@ -50,7 +50,8 @@
         .admin-menu-btn.active { background: #e0f2fe; color: var(--primary); }
 
         .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-        .lesson-card { cursor: pointer; border: 2px solid transparent; position: relative; overflow: hidden; min-height: 150px; display: flex; flex-direction: column; justify-content: center; padding: 20px; }
+        .lesson-card { cursor: pointer; border: 2px solid transparent; position: relative; overflow: hidden; min-height: 150px; display: flex; flex-direction: column; justify-content: center; padding: 20px; transition: 0.3s; }
+        .lesson-card:hover { border-color: var(--primary); }
         .lesson-num { position: absolute; right: 10px; top: 0; font-size: 5rem; font-weight: 900; color: #f0f9ff; z-index: 0; line-height: 1; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
@@ -68,9 +69,10 @@
         .hidden { display: none !important; }
         .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(3px); }
         .modal-content { background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-        
-        /* สไตล์เพิ่มเติมสำหรับหน้า Monitor */
         .clickable-row:hover { background-color: #f0f9ff; cursor: pointer; transition: 0.2s; }
+
+        /* Timer UI */
+        .timer-badge { background: #0f172a; color: #10b981; padding: 5px 12px; border-radius: 20px; font-family: monospace; font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -104,17 +106,28 @@
     </div>
 
     <div id="pageStudent" class="hidden">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>📚 บทเรียน: ระบบคอมพิวเตอร์ฯ</h3>
-            <button onclick="openMyProfile()" class="btn btn-outline btn-sm"><i class="ph ph-chart-bar"></i> ดูคะแนน</button>
-        </div>
-        <div id="lessonGrid" class="lesson-grid"></div>
-        <div id="lessonViewer" class="hidden card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 id="viewerTitle" style="margin:0;">Title</h2>
-                <button onclick="closeLesson()" class="btn btn-sm btn-outline">ปิด</button>
+        <div style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); box-shadow: var(--shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h2 style="margin:0; color:var(--primary);">สวัสดี, <span id="stdNameHeader">...</span></h2>
+                    <p style="margin:5px 0 0 0; color:var(--secondary); font-size: 0.9rem;">
+                        <i class="ph ph-clock"></i> เวลาเรียนรวมทั้งหมด: <b id="totalStudyTimeDisplay" style="color:var(--text); font-size: 1.1rem;">0</b> นาที
+                    </p>
+                </div>
+                <button onclick="openMyProfile()" class="btn btn-outline btn-sm"><i class="ph ph-chart-bar"></i> ดูประวัติคะแนน</button>
             </div>
-            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+        </div>
+
+        <div id="lessonGrid" class="lesson-grid"></div>
+
+        <div id="lessonViewer" class="hidden card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h2 id="viewerTitle" style="margin:0;">Title</h2>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="timer-badge" id="lessonTimerDisp">00:00</div>
+                    <button onclick="closeLesson()" class="btn btn-sm btn-outline">ปิดบทเรียน</button>
+                </div>
+            </div>
             <div class="login-tabs">
                 <button class="tab-btn active" onclick="switchContent('read')" id="btnTabRead">📖 เนื้อหา</button>
                 <button class="tab-btn" onclick="switchContent('quiz')" id="btnTabQuiz">📝 แบบทดสอบ</button>
@@ -192,15 +205,16 @@
 
         <div id="admMonitor" class="admin-section hidden">
             <div class="card">
-                <h3>👀 ติดตามผลการเรียน (คลิกที่ชื่อเพื่อดูรายละเอียด)</h3>
+                <h3>👀 ติดตามผลการเรียนแบบเรียลไทม์</h3>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>รหัส</th>
                                 <th>ชื่อ-สกุล / ชั้น</th>
+                                <th>เวลาเรียนรวม</th>
                                 <th>เข้าเรียนล่าสุด</th>
-                                <th>บทที่จบ</th>
+                                <th>บทเรียนที่จบ</th>
                                 <th>คะแนนล่าสุด</th>
                             </tr>
                         </thead>
@@ -254,18 +268,14 @@
     <div class="modal-content" style="max-width: 800px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 id="detStdTitle" style="margin:0; color:var(--primary);">ข้อมูลคะแนน</h2>
-            <button onclick="closeModal('modalStdDetail')" class="btn btn-sm btn-outline">ปิดหน้าต่าง</button>
+            <button onclick="closeModal('modalStdDetail')" class="btn btn-sm btn-outline">ปิด</button>
         </div>
         <div id="detStats" class="stats-grid"></div>
+        <div id="detTimeDetail" class="card" style="font-size: 0.9rem; margin-bottom: 20px; background: #f8fafc;"></div>
         <div class="table-responsive">
             <table style="font-size: 0.9rem;">
                 <thead>
-                    <tr style="background:#f1f5f9;">
-                        <th>บทเรียน</th>
-                        <th>วันที่สอบ</th>
-                        <th>คะแนน</th>
-                        <th>ผลการสอบ</th>
-                    </tr>
+                    <tr style="background:#f1f5f9;"><th>บทเรียน</th><th>วันที่สอบ</th><th>คะแนน</th><th>ผลการสอบ</th></tr>
                 </thead>
                 <tbody id="detHistory"></tbody>
             </table>
@@ -274,7 +284,7 @@
 </div>
 
 <script>
-    // --- CONFIG ---
+    // --- CONFIG (ใช้ข้อมูลเดิมของคุณ) ---
     const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E';
 
@@ -295,6 +305,12 @@
     let lessons = [];
     let curLesson = null;
     let tempQuiz = [];
+
+    // --- State สำหรับระบบเวลา ---
+    let studyTimer; 
+    let secondsSpent = 0;
+    let currentUnitKey = '';
+    let autoSaveInterval;
 
     // --- AUTH ---
     function switchLoginTab(type) {
@@ -325,184 +341,16 @@
         document.getElementById('pageLogin').classList.add('hidden');
         document.getElementById('authMenu').classList.remove('hidden');
         document.getElementById('userDisplay').innerText = role === 'student' ? `น้อง${user.student_name}` : 'ครูผู้สอน';
-        if (role === 'student') { document.getElementById('pageStudent').classList.remove('hidden'); loadStudentLessons(); }
+        if (role === 'student') { 
+            document.getElementById('pageStudent').classList.remove('hidden'); 
+            document.getElementById('stdNameHeader').innerText = user.student_name;
+            updateTotalTimeUI(user.study_time);
+            loadStudentLessons(); 
+        }
         else { document.getElementById('pageTeacher').classList.remove('hidden'); switchAdmin('overview'); }
     }
 
     function logout() { location.reload(); }
-
-    // --- ADMIN ---
-    function switchAdmin(pageId) {
-        document.querySelectorAll('.admin-menu-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.admin-section').forEach(el => el.classList.add('hidden'));
-        const btnMap = {'overview':'btnAdm1', 'students':'btnAdm2', 'content':'btnAdm3', 'monitor':'btnAdm4'};
-        document.getElementById(btnMap[pageId]).classList.add('active');
-        
-        if(pageId === 'overview') { document.getElementById('admOverview').classList.remove('hidden'); loadAdminStats(); }
-        if(pageId === 'students') { document.getElementById('admStudents').classList.remove('hidden'); loadStudents(); }
-        if(pageId === 'content') { document.getElementById('admContent').classList.remove('hidden'); loadContentList(); }
-        if(pageId === 'monitor') { document.getElementById('admMonitor').classList.remove('hidden'); loadMonitor(); }
-    }
-
-    async function loadStudents() {
-        const { data } = await sb.from('student_progress').select('*').order('student_code');
-        students = data || [];
-        renderStdTable();
-    }
-
-    function renderStdTable() {
-        const term = document.getElementById('searchStd').value.toLowerCase();
-        const tbody = document.getElementById('tbodyStd');
-        tbody.innerHTML = students.filter(s => s.student_name.toLowerCase().includes(term) || s.student_code.includes(term)).map(s => `
-            <tr>
-                <td>${(s.last_login && new Date() - new Date(s.last_login) < 300000) ? '<span class="status-badge online">ออนไลน์</span>' : '<span class="status-badge offline">ออฟไลน์</span>'}</td>
-                <td><b>${s.student_code}</b></td>
-                <td>${s.student_name}</td>
-                <td>${s.student_class} / ${s.student_number}</td>
-                <td>
-                    <button onclick='editStd(${JSON.stringify(s)})' class="btn btn-sm btn-outline">✏️</button>
-                    <button onclick="delStd(${s.id})" class="btn btn-sm btn-danger">🗑</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    function openStdModal() { document.getElementById('mStdId').value=''; document.getElementById('mStdCode').value=''; document.getElementById('mStdName').value=''; document.getElementById('mStdClass').value=''; document.getElementById('mStdNum').value=''; document.getElementById('modalStd').classList.remove('hidden'); }
-    function editStd(s) { document.getElementById('mStdId').value=s.id; document.getElementById('mStdCode').value=s.student_code; document.getElementById('mStdName').value=s.student_name; document.getElementById('mStdClass').value=s.student_class; document.getElementById('mStdNum').value=s.student_number; document.getElementById('modalStd').classList.remove('hidden'); }
-    async function saveStdDB() {
-        const p = { student_code: document.getElementById('mStdCode').value, student_name: document.getElementById('mStdName').value, student_class: document.getElementById('mStdClass').value, student_number: document.getElementById('mStdNum').value };
-        if(document.getElementById('mStdId').value) await sb.from('student_progress').update(p).eq('id', document.getElementById('mStdId').value);
-        else await sb.from('student_progress').insert([{...p, completed_lessons:[]}]);
-        closeModal('modalStd'); loadStudents();
-    }
-    async function delStd(id) { if(confirm('ลบ?')) { await sb.from('student_progress').delete().eq('id', id); loadStudents(); } }
-
-    async function loadMonitor() {
-        const { data: stds } = await sb.from('student_progress').select('*').order('student_code');
-        const { data: scores } = await sb.from('quiz_results').select('*').order('created_at', {ascending:false});
-        const tb = document.getElementById('tbodyMonitor');
-        tb.innerHTML = stds.map(s => {
-            const lastS = scores.find(sc => sc.student_id === s.id);
-            return `
-                <tr class="clickable-row" onclick="viewStudentDetail(${s.id}, '${s.student_name}', '${s.student_code}')">
-                    <td><b>${s.student_code}</b></td>
-                    <td>
-                        <div style="font-weight:bold; color:var(--primary);">${s.student_name}</div>
-                        <small>${s.student_class} เลขที่ ${s.student_number}</small>
-                    </td>
-                    <td>${s.last_login ? new Date(s.last_login).toLocaleString('th-TH') : '-'}</td>
-                    <td style="text-align:center;">${s.completed_lessons?.length || 0}</td>
-                    <td>${lastS ? `<span class="status-badge ${lastS.passed?'online':'offline'}">${lastS.score}/${lastS.total_score}</span>` : '-'}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    async function viewStudentDetail(id, name, code) {
-        document.getElementById('detStdTitle').innerText = `📊 (${code}) ${name}`;
-        const { data: results } = await sb.from('quiz_results').select('*, lessons(title)').eq('student_id', id).order('created_at', {ascending:false});
-        const { data: progress } = await sb.from('student_progress').select('completed_lessons').eq('id', id).single();
-        
-        const passed = results?.filter(r => r.passed).length || 0;
-        document.getElementById('detStats').innerHTML = `
-            <div class="card stat-card"><div class="stat-val">${progress.completed_lessons?.length || 0}</div><small>บทเรียนที่จบ</small></div>
-            <div class="card stat-card" style="border-bottom:4px solid var(--success);"><div class="stat-val">${passed}</div><small>ผ่านเกณฑ์</small></div>
-            <div class="card stat-card" style="border-bottom:4px solid var(--danger);"><div class="stat-val">${results?.length || 0}</div><small>จำนวนครั้งที่สอบ</small></div>
-        `;
-
-        document.getElementById('detHistory').innerHTML = results?.length ? results.map(r => `
-            <tr>
-                <td>${r.lessons?.title || 'บทเรียน'}</td>
-                <td>${new Date(r.created_at).toLocaleDateString('th-TH')}</td>
-                <td><b>${r.score}</b> / ${r.total_score}</td>
-                <td><span class="status-badge ${r.passed?'online':'offline'}">${r.passed?'ผ่านเกณฑ์':'ไม่ผ่าน'}</span></td>
-            </tr>
-        `).join('') : '<tr><td colspan="4" style="text-align:center; padding:20px;">ยังไม่มีประวัติการสอบ</td></tr>';
-        
-        document.getElementById('modalStdDetail').classList.remove('hidden');
-    }
-
-    async function loadContentList() {
-        const { data } = await sb.from('lessons').select('*').order('category');
-        lessons = data || [];
-        const div = document.getElementById('admLessonList'); div.innerHTML = '';
-        const sel = document.getElementById('editCat'); sel.innerHTML = Object.keys(UNITS).map(k => `<option value="${k}">${UNITS[k]}</option>`).join('');
-        lessons.forEach(l => {
-            div.innerHTML += `<div class="card" onclick="editLesson(${l.id})" style="padding:15px; cursor:pointer; border:1px solid #e2e8f0; margin-bottom:10px;"><b>${l.category}</b><br><small>${l.title}</small></div>`;
-        });
-    }
-
-    function editLesson(id) {
-        const l = lessons.find(x=>x.id==id);
-        document.getElementById('editorEmpty').classList.add('hidden');
-        document.getElementById('editor').classList.remove('hidden');
-        document.getElementById('editId').value = l.id;
-        document.getElementById('editTitle').value = l.title;
-        document.getElementById('editCat').value = l.category;
-        document.getElementById('editBody').value = l.content;
-        tempQuiz = l.quiz_data || [];
-        renderQuizPreview();
-    }
-
-    function newLesson() {
-        document.getElementById('editorEmpty').classList.add('hidden');
-        document.getElementById('editor').classList.remove('hidden');
-        document.getElementById('editId').value=''; document.getElementById('editTitle').value=''; document.getElementById('editBody').value=''; tempQuiz=[];
-        renderQuizPreview();
-    }
-
-    async function saveLessonDB() {
-        const p = { title: document.getElementById('editTitle').value, category: document.getElementById('editCat').value, content: document.getElementById('editBody').value, quiz_data: tempQuiz };
-        const id = document.getElementById('editId').value;
-        if(id) await sb.from('lessons').update(p).eq('id', id); else await sb.from('lessons').insert([p]);
-        alert('บันทึกสำเร็จ'); loadContentList();
-    }
-
-    async function deleteLessonDB() { if(confirm('ลบ?')) { await sb.from('lessons').delete().eq('id', document.getElementById('editId').value); loadContentList(); } }
-
-    function renderQuizPreview() {
-        document.getElementById('qCount').innerText = tempQuiz.length;
-        document.getElementById('quizListPreview').innerHTML = tempQuiz.map((q,i) => `<div style="padding:8px; background:white; border:1px solid #ddd; margin-bottom:5px; display:flex; justify-content:space-between;"><span>${i+1}. ${q.question}</span><button onclick="tempQuiz.splice(${i},1); renderQuizPreview()" class="btn btn-sm btn-danger">x</button></div>`).join('');
-    }
-
-    function openQuizModal() { document.getElementById('mqQuestion').value=''; document.getElementById('mqOptions').innerHTML=''; addOptionInput(); addOptionInput(); document.getElementById('modalQuiz').classList.remove('hidden'); }
-    function addOptionInput() {
-        const d = document.createElement('div'); d.style = "display:flex; gap:5px; margin-bottom:5px;";
-        d.innerHTML = `<input type="radio" name="corr"><input type="text" class="opt-val" placeholder="ตัวเลือก" style="flex:1;">`;
-        document.getElementById('mqOptions').appendChild(d);
-    }
-    function saveQuizLocal() {
-        const q = document.getElementById('mqQuestion').value;
-        const opts = []; let c = -1;
-        document.querySelectorAll('#mqOptions > div').forEach((r, i) => {
-            opts.push(r.querySelector('.opt-val').value);
-            if(r.querySelector('input[name="corr"]').checked) c = i;
-        });
-        if(c===-1) return alert('เลือกข้อที่ถูกต้อง');
-        tempQuiz.push({ question: q, options: opts, correct: c });
-        renderQuizPreview(); closeModal('modalQuiz');
-    }
-
-    async function loadAdminStats() {
-        const { count: stdCount } = await sb.from('student_progress').select('*', { count: 'exact' });
-        const { count: lessonCount } = await sb.from('lessons').select('*', { count: 'exact' });
-        const { data: results } = await sb.from('quiz_results').select('*');
-        document.getElementById('statStdCount').innerText = stdCount || 0;
-        document.getElementById('statLessonCount').innerText = lessonCount || 0;
-        const passed = results?.filter(r => r.passed).length || 0;
-        document.getElementById('statPassRate').innerText = results?.length ? Math.round((passed/results.length)*100) + '%' : '0%';
-        
-        // Chart
-        const ctx = document.getElementById('scoreChart');
-        if(window.myChart) window.myChart.destroy();
-        window.myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.values(UNITS).map(u => u.split('. ')[1].substring(0,10)+'...'),
-                datasets: [{ label: 'จำนวนคนที่สอบผ่าน', data: [0,0,0,0,0,0,0,0], backgroundColor: '#0ea5e9', borderRadius: 5 }]
-            }
-        });
-    }
 
     // --- STUDENT LOGIC ---
     async function loadStudentLessons() {
@@ -526,11 +374,62 @@
         document.getElementById('lessonGrid').classList.add('hidden');
         document.getElementById('lessonViewer').classList.remove('hidden');
         document.getElementById('viewerTitle').innerText = UNITS[key];
+        
+        // Start Timer
+        startStudyTimer(key);
+        
         switchContent('read');
         if(!user.completed_lessons.includes(data.id)) {
             user.completed_lessons.push(data.id);
             await sb.from('student_progress').update({ completed_lessons: user.completed_lessons }).eq('id', user.id);
         }
+    }
+
+    // ระบบจับเวลา [JSONB]
+    function startStudyTimer(unitKey) {
+        currentUnitKey = unitKey;
+        secondsSpent = 0;
+        if(studyTimer) clearInterval(studyTimer);
+        studyTimer = setInterval(() => {
+            secondsSpent++;
+            const mins = String(Math.floor(secondsSpent / 60)).padStart(2, '0');
+            const secs = String(secondsSpent % 60).padStart(2, '0');
+            document.getElementById('lessonTimerDisp').innerText = `${mins}:${secs}`;
+        }, 1000);
+
+        // Auto Save ทุก 30 วินาที
+        if(autoSaveInterval) clearInterval(autoSaveInterval);
+        autoSaveInterval = setInterval(saveStudyTime, 30000);
+    }
+
+    async function saveStudyTime() {
+        if (!currentUnitKey || secondsSpent < 2) return;
+        
+        const { data } = await sb.from('student_progress').select('study_time').eq('id', user.id).single();
+        let currentData = data?.study_time || {};
+        
+        const oldTime = currentData[currentUnitKey] || 0;
+        currentData[currentUnitKey] = oldTime + secondsSpent;
+        
+        await sb.from('student_progress').update({ study_time: currentData, last_login: new Date() }).eq('id', user.id);
+        
+        user.study_time = currentData; // Update local
+        updateTotalTimeUI(currentData);
+        secondsSpent = 0; // Reset counter หลังบันทึก
+    }
+
+    function updateTotalTimeUI(studyTimeObj) {
+        if(!studyTimeObj) return;
+        const totalSeconds = Object.values(studyTimeObj).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+        document.getElementById('totalStudyTimeDisplay').innerText = Math.floor(totalSeconds / 60);
+    }
+
+    function closeLesson() { 
+        saveStudyTime();
+        clearInterval(studyTimer);
+        clearInterval(autoSaveInterval);
+        document.getElementById('lessonViewer').classList.add('hidden'); 
+        document.getElementById('lessonGrid').classList.remove('hidden'); 
     }
 
     function switchContent(t) {
@@ -560,29 +459,194 @@
 
     async function submitStudentQuiz() {
         let score = 0;
+        const total = curLesson.quiz_data.length;
         curLesson.quiz_data.forEach((q, i) => {
             const sel = document.querySelector(`input[name="q${i}"]:checked`);
             if(sel && parseInt(sel.value) === q.correct) score++;
         });
-        alert(`คุณได้คะแนน ${score} / ${curLesson.quiz_data.length}`);
+
+        const percent = (score / total) * 100;
+        const passed = percent >= 60; // Accuracy: 60% Passing Grade
+
+        alert(`คุณได้คะแนน ${score} / ${total} (${percent.toFixed(2)}%)\nผลการสอบ: ${passed ? 'ผ่านเกณฑ์ ✅' : 'ไม่ผ่านเกณฑ์ ❌'}`);
+        
         await sb.from('quiz_results').insert([{
-            student_id: user.id, lesson_id: curLesson.id, score, total_score: curLesson.quiz_data.length, passed: (score/curLesson.quiz_data.length >= 0.5)
+            student_id: user.id, lesson_id: curLesson.id, score, total_score: total, passed: passed
         }]);
         closeLesson();
     }
 
-    async function openMyProfile() {
-        const { data } = await sb.from('quiz_results').select('*, lessons(title)').eq('student_id', user.id);
-        const { data: prog } = await sb.from('student_progress').select('completed_lessons').eq('id', user.id).single();
-        document.getElementById('profileStats').innerHTML = `
-            <div class="card stat-card"><div class="stat-val">${prog.completed_lessons?.length || 0}</div><small>บทเรียนที่จบ</small></div>
-            <div class="card stat-card" style="border-bottom:4px solid var(--success);"><div class="stat-val">${data?.filter(x=>x.passed).length || 0}</div><small>ผ่านเกณฑ์</small></div>
-        `;
-        document.getElementById('profileHistory').innerHTML = data?.map(d => `<tr><td>${d.lessons?.title}</td><td>${d.score}/${d.total_score}</td><td>${d.passed?'✅':'❌'}</td></tr>`).join('') || '';
-        document.getElementById('modalProfile').classList.remove('hidden');
+    // --- ADMIN LOGIC ---
+    function switchAdmin(pageId) {
+        document.querySelectorAll('.admin-menu-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.admin-section').forEach(el => el.classList.add('hidden'));
+        const btnMap = {'overview':'btnAdm1', 'students':'btnAdm2', 'content':'btnAdm3', 'monitor':'btnAdm4'};
+        document.getElementById(btnMap[pageId]).classList.add('active');
+        
+        if(pageId === 'overview') { document.getElementById('admOverview').classList.remove('hidden'); loadAdminStats(); }
+        if(pageId === 'students') { document.getElementById('admStudents').classList.remove('hidden'); loadStudents(); }
+        if(pageId === 'content') { document.getElementById('admContent').classList.remove('hidden'); loadContentList(); }
+        if(pageId === 'monitor') { document.getElementById('admMonitor').classList.remove('hidden'); loadMonitor(); }
     }
 
-    function closeLesson() { document.getElementById('lessonViewer').classList.add('hidden'); document.getElementById('lessonGrid').classList.remove('hidden'); }
+    async function loadMonitor() {
+        const { data: stds } = await sb.from('student_progress').select('*').order('student_code');
+        const { data: scores } = await sb.from('quiz_results').select('*').order('created_at', {ascending:false});
+        const tb = document.getElementById('tbodyMonitor');
+        tb.innerHTML = stds.map(s => {
+            const lastS = scores.find(sc => sc.student_id === s.id);
+            const totalSec = s.study_time ? Object.values(s.study_time).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0) : 0;
+            return `
+                <tr class="clickable-row" onclick="viewStudentDetail(${s.id}, '${s.student_name}', '${s.student_code}')">
+                    <td><b>${s.student_code}</b></td>
+                    <td>
+                        <div style="font-weight:bold; color:var(--primary);">${s.student_name}</div>
+                        <small>${s.student_class} เลขที่ ${s.student_number}</small>
+                    </td>
+                    <td><span style="color:var(--primary); font-weight:bold;">${Math.floor(totalSec / 60)}</span> นาที</td>
+                    <td>${s.last_login ? new Date(s.last_login).toLocaleString('th-TH') : '-'}</td>
+                    <td style="text-align:center;">${s.completed_lessons?.length || 0}</td>
+                    <td>${lastS ? `<span class="status-badge ${lastS.passed?'online':'offline'}">${lastS.score}/${lastS.total_score}</span>` : '-'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function viewStudentDetail(id, name, code) {
+        const { data: s } = await sb.from('student_progress').select('*').eq('id', id).single();
+        document.getElementById('detStdTitle').innerText = `📊 (${code}) ${name}`;
+        const { data: results } = await sb.from('quiz_results').select('*, lessons(title)').eq('student_id', id).order('created_at', {ascending:false});
+        
+        const passedCount = results?.filter(r => r.passed).length || 0;
+        document.getElementById('detStats').innerHTML = `
+            <div class="card stat-card"><div class="stat-val">${s.completed_lessons?.length || 0}</div><small>บทเรียนที่จบ</small></div>
+            <div class="card stat-card" style="border-bottom:4px solid var(--success);"><div class="stat-val">${passedCount}</div><small>ผ่านเกณฑ์</small></div>
+            <div class="card stat-card" style="border-bottom:4px solid var(--primary);"><div class="stat-val">${results?.length || 0}</div><small>จำนวนครั้งที่สอบ</small></div>
+        `;
+
+        // รายละเอียดเวลาเรียนรายบท
+        let timeHTML = '<strong>⏱ เวลาเรียนรายบท:</strong><div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px;">';
+        Object.keys(UNITS).forEach(k => {
+            const sec = s.study_time?.[k] || 0;
+            timeHTML += `<div>${UNITS[k].split('. ')[1]}: <b>${Math.floor(sec/60)}น. ${sec%60}ว.</b></div>`;
+        });
+        timeHTML += '</div>';
+        document.getElementById('detTimeDetail').innerHTML = timeHTML;
+
+        document.getElementById('detHistory').innerHTML = results?.length ? results.map(r => `
+            <tr>
+                <td>${r.lessons?.title || 'บทเรียน'}</td>
+                <td>${new Date(r.created_at).toLocaleDateString('th-TH')}</td>
+                <td><b>${r.score}</b> / ${r.total_score}</td>
+                <td><span class="status-badge ${r.passed?'online':'offline'}">${r.passed?'ผ่านเกณฑ์':'ไม่ผ่าน'}</span></td>
+            </tr>
+        `).join('') : '<tr><td colspan="4" style="text-align:center;">ยังไม่มีประวัติการสอบ</td></tr>';
+        
+        document.getElementById('modalStdDetail').classList.remove('hidden');
+    }
+
+    // --- ส่วนที่เหลือ (Admin Functions) ---
+    async function loadStudents() {
+        const { data } = await sb.from('student_progress').select('*').order('student_code');
+        students = data || []; renderStdTable();
+    }
+    function renderStdTable() {
+        const term = document.getElementById('searchStd').value.toLowerCase();
+        const tbody = document.getElementById('tbodyStd');
+        tbody.innerHTML = students.filter(s => s.student_name.toLowerCase().includes(term) || s.student_code.includes(term)).map(s => `
+            <tr>
+                <td>${(s.last_login && new Date() - new Date(s.last_login) < 300000) ? '<span class="status-badge online">ออนไลน์</span>' : '<span class="status-badge offline">ออฟไลน์</span>'}</td>
+                <td><b>${s.student_code}</b></td>
+                <td>${s.student_name}</td>
+                <td>${s.student_class} / ${s.student_number}</td>
+                <td>
+                    <button onclick='editStd(${JSON.stringify(s)})' class="btn btn-sm btn-outline">✏️</button>
+                    <button onclick="delStd(${s.id})" class="btn btn-sm btn-danger">🗑</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    function openStdModal() { document.getElementById('mStdId').value=''; document.getElementById('mStdCode').value=''; document.getElementById('mStdName').value=''; document.getElementById('mStdClass').value=''; document.getElementById('mStdNum').value=''; document.getElementById('modalStd').classList.remove('hidden'); }
+    function editStd(s) { document.getElementById('mStdId').value=s.id; document.getElementById('mStdCode').value=s.student_code; document.getElementById('mStdName').value=s.student_name; document.getElementById('mStdClass').value=s.student_class; document.getElementById('mStdNum').value=s.student_number; document.getElementById('modalStd').classList.remove('hidden'); }
+    async function saveStdDB() {
+        const p = { student_code: document.getElementById('mStdCode').value, student_name: document.getElementById('mStdName').value, student_class: document.getElementById('mStdClass').value, student_number: document.getElementById('mStdNum').value };
+        if(document.getElementById('mStdId').value) await sb.from('student_progress').update(p).eq('id', document.getElementById('mStdId').value);
+        else await sb.from('student_progress').insert([{...p, completed_lessons:[], study_time: {}}]);
+        closeModal('modalStd'); loadStudents();
+    }
+    async function delStd(id) { if(confirm('ลบ?')) { await sb.from('student_progress').delete().eq('id', id); loadStudents(); } }
+    async function loadContentList() {
+        const { data } = await sb.from('lessons').select('*').order('category');
+        lessons = data || [];
+        const div = document.getElementById('admLessonList'); div.innerHTML = '';
+        const sel = document.getElementById('editCat'); sel.innerHTML = Object.keys(UNITS).map(k => `<option value="${k}">${UNITS[k]}</option>`).join('');
+        lessons.forEach(l => {
+            div.innerHTML += `<div class="card" onclick="editLesson(${l.id})" style="padding:15px; cursor:pointer; border:1px solid #e2e8f0; margin-bottom:10px;"><b>${l.category}</b><br><small>${l.title}</small></div>`;
+        });
+    }
+    function editLesson(id) {
+        const l = lessons.find(x=>x.id==id);
+        document.getElementById('editorEmpty').classList.add('hidden');
+        document.getElementById('editor').classList.remove('hidden');
+        document.getElementById('editId').value = l.id;
+        document.getElementById('editTitle').value = l.title;
+        document.getElementById('editCat').value = l.category;
+        document.getElementById('editBody').value = l.content;
+        tempQuiz = l.quiz_data || [];
+        renderQuizPreview();
+    }
+    function newLesson() {
+        document.getElementById('editorEmpty').classList.add('hidden');
+        document.getElementById('editor').classList.remove('hidden');
+        document.getElementById('editId').value=''; document.getElementById('editTitle').value=''; document.getElementById('editBody').value=''; tempQuiz=[];
+        renderQuizPreview();
+    }
+    async function saveLessonDB() {
+        const p = { title: document.getElementById('editTitle').value, category: document.getElementById('editCat').value, content: document.getElementById('editBody').value, quiz_data: tempQuiz };
+        const id = document.getElementById('editId').value;
+        if(id) await sb.from('lessons').update(p).eq('id', id); else await sb.from('lessons').insert([p]);
+        alert('บันทึกสำเร็จ'); loadContentList();
+    }
+    async function deleteLessonDB() { if(confirm('ลบ?')) { await sb.from('lessons').delete().eq('id', document.getElementById('editId').value); loadContentList(); } }
+    function renderQuizPreview() {
+        document.getElementById('qCount').innerText = tempQuiz.length;
+        document.getElementById('quizListPreview').innerHTML = tempQuiz.map((q,i) => `<div style="padding:8px; background:white; border:1px solid #ddd; margin-bottom:5px; display:flex; justify-content:space-between;"><span>${i+1}. ${q.question}</span><button onclick="tempQuiz.splice(${i},1); renderQuizPreview()" class="btn btn-sm btn-danger">x</button></div>`).join('');
+    }
+    function openQuizModal() { document.getElementById('mqQuestion').value=''; document.getElementById('mqOptions').innerHTML=''; addOptionInput(); addOptionInput(); document.getElementById('modalQuiz').classList.remove('hidden'); }
+    function addOptionInput() {
+        const d = document.createElement('div'); d.style = "display:flex; gap:5px; margin-bottom:5px;";
+        d.innerHTML = `<input type="radio" name="corr"><input type="text" class="opt-val" placeholder="ตัวเลือก" style="flex:1;">`;
+        document.getElementById('mqOptions').appendChild(d);
+    }
+    function saveQuizLocal() {
+        const q = document.getElementById('mqQuestion').value;
+        const opts = []; let c = -1;
+        document.querySelectorAll('#mqOptions > div').forEach((r, i) => {
+            opts.push(r.querySelector('.opt-val').value);
+            if(r.querySelector('input[name="corr"]').checked) c = i;
+        });
+        if(c===-1) return alert('เลือกข้อที่ถูกต้อง');
+        tempQuiz.push({ question: q, options: opts, correct: c });
+        renderQuizPreview(); closeModal('modalQuiz');
+    }
+    async function loadAdminStats() {
+        const { count: stdCount } = await sb.from('student_progress').select('*', { count: 'exact' });
+        const { count: lessonCount } = await sb.from('lessons').select('*', { count: 'exact' });
+        const { data: results } = await sb.from('quiz_results').select('*');
+        document.getElementById('statStdCount').innerText = stdCount || 0;
+        document.getElementById('statLessonCount').innerText = lessonCount || 0;
+        const passed = results?.filter(r => r.passed).length || 0;
+        document.getElementById('statPassRate').innerText = results?.length ? Math.round((passed/results.length)*100) + '%' : '0%';
+    }
+    async function openMyProfile() {
+        const { data } = await sb.from('quiz_results').select('*, lessons(title)').eq('student_id', user.id).order('created_at', {ascending:false});
+        document.getElementById('profileStats').innerHTML = `
+            <div class="card stat-card"><div class="stat-val">${user.completed_lessons?.length || 0}</div><small>บทเรียนที่จบ</small></div>
+            <div class="card stat-card" style="border-bottom:4px solid var(--success);"><div class="stat-val">${data?.filter(x=>x.passed).length || 0}</div><small>ผ่านเกณฑ์</small></div>
+        `;
+        document.getElementById('profileHistory').innerHTML = data?.map(d => `<tr><td>${d.lessons?.title || 'บทเรียน'}</td><td>${d.score}/${d.total_score}</td><td>${d.passed?'✅':'❌'}</td></tr>`).join('') || '';
+        document.getElementById('modalProfile').classList.remove('hidden');
+    }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 </script>
 </body>
