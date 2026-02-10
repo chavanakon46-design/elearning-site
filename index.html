@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRU DREAM: ระบบคอมพิวเตอร์และเทคโนโลยีสื่อสาร</title>
+    <title>KRU DREAM: ระบบคอมพิวเตอร์ (V.12.0 Final)</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,8 +11,7 @@
 
     <style>
         :root {
-            --primary: #0284c7; /* สีฟ้า Sky Blue (ธีมคอมพิวเตอร์) */
-            --primary-dark: #0369a1;
+            --primary: #0ea5e9; /* Sky Blue */
             --secondary: #64748b;
             --success: #10b981;
             --danger: #ef4444;
@@ -47,7 +46,7 @@
         .login-box { width: 100%; max-width: 450px; text-align: center; border-top: 5px solid var(--primary); }
         .login-tabs { display: flex; margin-bottom: 20px; background: #e0f2fe; padding: 5px; border-radius: 10px; }
         .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: bold; color: var(--primary); transition: 0.3s; }
-        .tab-btn.active { background: white; color: var(--primary-dark); box-shadow: var(--shadow); }
+        .tab-btn.active { background: white; color: #0369a1; box-shadow: var(--shadow); }
 
         /* Admin Menu (Fixed) */
         .admin-menu-bar { display: flex; gap: 10px; overflow-x: auto; background: white; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; position: sticky; top: 0; z-index: 10; }
@@ -94,7 +93,7 @@
     <div id="pageLogin" class="login-wrapper">
         <div class="card login-box">
             <h2 style="color:var(--primary);">เข้าสู่ระบบห้องเรียน</h2>
-            <p style="color:var(--secondary); margin-bottom: 20px;">วิชา วิทยาการคำนวณ (เทคโนโลยี)</p>
+            <p style="color:var(--secondary); margin-bottom: 20px;">วิชา เทคโนโลยี (วิทยาการคำนวณ)</p>
             
             <div class="login-tabs">
                 <button class="tab-btn active" onclick="switchLoginTab('student')" id="tabLoginStd">👨‍🎓 นักเรียน</button>
@@ -180,7 +179,7 @@
                 <div class="table-responsive">
                     <table id="tableStd">
                         <thead><tr><th>สถานะ</th><th>รหัสนักเรียน</th><th>ชื่อ-นามสกุล</th><th>ชั้น/เลขที่</th><th>จัดการ</th></tr></thead>
-                        <tbody id="tbodyStd"><tr><td colspan="5" style="text-align:center;">กำลังโหลด...</td></tr></tbody>
+                        <tbody id="tbodyStd"><tr><td colspan="5" style="text-align:center;">กำลังโหลดข้อมูล...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -202,7 +201,7 @@
                         
                         <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-top: 15px;">
                             <div style="display:flex; justify-content:space-between;">
-                                <h4 style="margin:0; color:var(--primary-dark);">🧠 ข้อสอบ (<span id="qCount">0</span> ข้อ)</h4>
+                                <h4 style="margin:0; color:#0369a1;">🧠 ข้อสอบ (<span id="qCount">0</span> ข้อ)</h4>
                                 <button onclick="openQuizModal()" class="btn btn-sm btn-outline">+ เพิ่มข้อสอบ</button>
                             </div>
                             <div id="quizListPreview" style="margin-top: 10px;"></div>
@@ -280,10 +279,10 @@
 <script>
     // --- CONFIGURATION ---
     // ⚠️⚠️ แก้ไขตรงนี้: ใส่ URL และ Key ของคุณ ⚠️⚠️
-    const SUPABASE_URL = 'https://gruvotwrukrqwvaudaro.supabase.co'; 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdydXZvdHdydWtycXd2YXVkYXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwMzk3NTksImV4cCI6MjA4NDYxNTc1OX0.GkBklU6IxxNgpCZ3FmFdnAwqPGtJLbcyZxlO5YMD3PA';
+    const SUPABASE_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E';
 
-    // หัวข้อ 8 บท (ตามที่คุณต้องการ)
+    // หัวข้อ 8 บท (ระบบคอมพิวเตอร์ฯ)
     const UNITS = {
         'unit1': '1. องค์ประกอบของระบบคอมพิวเตอร์',
         'unit2': '2. หลักการทำงานของระบบคอมพิวเตอร์',
@@ -356,7 +355,7 @@
 
     function logout() { location.reload(); }
 
-    // --- ADMIN SYSTEM (Fixed Logic) ---
+    // --- ADMIN SYSTEM ---
     function switchAdmin(pageId) {
         document.querySelectorAll('.admin-menu-btn').forEach(b => b.classList.remove('active'));
         if(pageId === 'overview') document.getElementById('btnAdm1').classList.add('active');
@@ -364,10 +363,7 @@
         if(pageId === 'content') document.getElementById('btnAdm3').classList.add('active');
         if(pageId === 'monitor') document.getElementById('btnAdm4').classList.add('active');
 
-        // Hide all sections first
         document.querySelectorAll('.admin-section').forEach(el => el.classList.add('hidden'));
-        
-        // Show correct section
         document.getElementById(pageId === 'overview' ? 'admOverview' : 
                               pageId === 'students' ? 'admStudents' : 
                               pageId === 'content' ? 'admContent' : 'admMonitor').classList.remove('hidden');
@@ -426,7 +422,7 @@
         else await sb.from('student_progress').insert([{...payload, study_time:{}, completed_lessons:[]}]);
         closeModal('modalStd'); loadStudents();
     }
-    async function delStd(id) { if(confirm('ลบ?')) { await sb.from('student_progress').delete().eq('id', id); loadStudents(); } }
+    async function delStd(id) { if(confirm('ยืนยันลบ?')) { await sb.from('student_progress').delete().eq('id', id); loadStudents(); } }
 
     // Admin: Content
     async function loadContentList() {
@@ -460,7 +456,6 @@
         document.getElementById('quizListPreview').innerHTML = tempQuiz.map((q,i) => `<div style="padding:10px; background:white; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:5px; display:flex; justify-content:space-between;"><span>${i+1}. ${q.question}</span><button onclick="tempQuiz.splice(${i},1); renderQuizPreview()" class="btn btn-sm btn-danger">x</button></div>`).join('');
     }
 
-    // Quiz Modal
     function openQuizModal() { document.getElementById('mqQuestion').value=''; document.getElementById('mqOptions').innerHTML=''; addOptionInput(); addOptionInput(); document.getElementById('modalQuiz').classList.remove('hidden'); }
     function addOptionInput() { 
         const d = document.createElement('div'); d.style.display='flex'; d.style.gap='5px'; d.style.marginBottom='5px';
@@ -614,4 +609,3 @@
 </script>
 </body>
 </html>
-
