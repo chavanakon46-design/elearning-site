@@ -3,459 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRU DREAM: ระบบคอมพิวเตอร์และเทคโนโลยีการสื่อสาร</title>
+    <title>KRU DREAM | ห้องเรียนคอมพิวเตอร์ยุคใหม่</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <style>
         :root {
-            --primary: #0ea5e9;
-            --primary-dark: #0369a1;
-            --secondary: #64748b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --glass: rgba(255, 255, 255, 0.8);
-            --bg: #f0f9ff;
-            --text: #0f172a;
-            --radius: 16px;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --primary: #0ea5e9; --secondary: #64748b; --success: #10b981;
+            --danger: #ef4444; --bg: #f8fafc; --text: #0f172a;
+            --radius: 20px; --shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
 
         body { 
-            font-family: 'Sarabun', sans-serif; 
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px;
-            min-height: 100vh;
+            font-family: 'Sarabun', sans-serif; background: var(--bg); 
+            color: var(--text); margin: 0; min-height: 100vh;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
-
-        /* Navbar Style */
-        .navbar { 
-            background: var(--glass); 
-            backdrop-filter: blur(10px);
-            padding: 15px 30px; 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.3);
+        /* Glassmorphism Design */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
+            padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.3); display: flex;
+            justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
         }
 
-        .brand { 
-            font-size: 1.8rem; 
-            font-weight: 800; 
-            background: linear-gradient(to right, var(--primary), #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex; align-items: center; gap: 12px;
+        .card {
+            background: white; border-radius: var(--radius); padding: 2rem;
+            box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
 
-        /* Card & UI */
-        .card { 
-            background: white; 
-            border-radius: var(--radius); 
-            padding: 25px; 
-            box-shadow: var(--shadow); 
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Login Styling from Image */
+        .login-container {
+            max-width: 500px; margin: 5rem auto; text-align: center;
         }
 
-        .btn { 
-            padding: 12px 24px; 
-            border-radius: 12px; 
-            border: none; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: 0.3s; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-outline { background: white; border: 1.5px solid #e2e8f0; color: var(--text); }
-
-        /* Lesson Grid Animation */
-        .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .lesson-card { 
-            cursor: pointer; position: relative; overflow: hidden; height: 180px;
-            background: linear-gradient(white, white) padding-box, 
-                        linear-gradient(135deg, #e0f2fe, white) border-box;
-            border: 2px solid transparent;
-        }
-        .lesson-card:hover { border-color: var(--primary); background: #f8fafc; }
-        .lesson-num { 
-            position: absolute; right: -10px; bottom: -20px; 
-            font-size: 8rem; font-weight: 900; color: #f1f5f9; z-index: 0; 
+        .tab-group {
+            background: #f1f5f9; padding: 0.5rem; border-radius: 15px;
+            display: flex; gap: 0.5rem; margin-bottom: 2rem;
         }
 
-        .timer-badge { 
-            background: #1e293b; color: #10b981; padding: 8px 20px; 
-            border-radius: 50px; font-family: 'JetBrains Mono', monospace; 
-            font-size: 1.3rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        .tab-btn {
+            flex: 1; padding: 0.8rem; border: none; border-radius: 10px;
+            cursor: pointer; font-weight: 600; transition: 0.3s; background: transparent;
         }
+
+        .tab-btn.active { background: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); color: var(--primary); }
+
+        /* Timer & Badge */
+        .timer-display {
+            background: #1e293b; color: #10b981; padding: 0.5rem 1.5rem;
+            border-radius: 50px; font-family: monospace; font-size: 1.5rem; font-weight: bold;
+        }
+
+        .lesson-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem; margin-top: 2rem;
+        }
+
+        .lesson-card {
+            cursor: pointer; position: relative; overflow: hidden; height: 160px;
+        }
+
+        .lesson-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+
+        .btn-main {
+            background: var(--primary); color: white; border: none; padding: 1rem 2rem;
+            border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;
+            transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+        }
+
+        .btn-main:hover { opacity: 0.9; transform: scale(1.02); }
 
         .hidden { display: none !important; }
-
-        /* Dashboard Stats */
-        .stat-card { border-top: 5px solid var(--primary); text-align: center; }
-        .stat-val { font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-
-        /* Input Styles */
-        input { 
-            width: 100%; padding: 15px; border-radius: 12px; 
-            border: 2px solid #e2e8f0; margin-bottom: 15px; font-size: 1rem;
-            transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
     </style>
 </head>
 <body>
 
-<div class="container animate__animated animate__fadeIn">
-    <nav class="navbar">
-        <div class="brand"><i class="ph-fill ph-cpu"></i> KRU DREAM</div>
-        <div id="authMenu" class="hidden">
-            <div style="display:flex; align-items:center; gap:20px;">
-                <span id="userDisplay" style="font-weight: 600;"></span>
-                <button onclick="logout()" class="btn btn-sm btn-outline" style="color:var(--danger); border-color:rgba(239, 68, 68, 0.2);">
-                    <i class="ph ph-power"></i> ออกจากระบบ
-                </button>
-            </div>
+    <nav class="glass-nav">
+        <div style="display:flex; align-items:center; gap:0.8rem; font-weight:800; color:var(--primary); font-size:1.5rem;">
+            <i class="ph-fill ph-rocket-launch"></i> KRU DREAM
+        </div>
+        <div id="userInfo" class="hidden" style="display:flex; align-items:center; gap:1.5rem;">
+            <span id="displayUserName" style="font-weight:600;"></span>
+            <button onclick="handleLogout()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">
+                <i class="ph ph-sign-out"></i> ออกจากระบบ
+            </button>
         </div>
     </nav>
 
-    <div id="pageLogin" class="login-wrapper animate__animated animate__zoomIn">
-        <div class="card" style="max-width: 450px; margin: 100px auto; text-align: center;">
-            <h2 style="margin-top:0;">🚀 เข้าสู่ห้องเรียนคอมพิวเตอร์</h2>
-            <p style="color:var(--secondary);">กรุณาเลือกประเภทการใช้งาน</p>
-            
-            <div style="display:flex; gap:10px; margin: 25px 0; background: #f1f5f9; padding: 6px; border-radius: 14px;">
-                <button class="btn btn-primary" style="flex:1" id="tabStd" onclick="switchLogin('std')">นักเรียน</button>
-                <button class="btn" style="flex:1; background:transparent; color:var(--text); box-shadow:none;" id="tabTea" onclick="switchLogin('tea')">คุณครู</button>
-            </div>
-
-            <div id="loginFormStd">
-                <input type="text" id="stdCode" placeholder="รหัสผ่าน 5 หลักของคุณ" maxlength="5" style="text-align:center; font-size:1.8rem; font-weight:800; letter-spacing:8px;">
-                <button onclick="studentLogin()" class="btn btn-primary" style="width:100%; justify-content:center; padding:18px;">
-                    เริ่มบทเรียนเลย <i class="ph ph-arrow-right"></i>
-                </button>
-            </div>
-
-            <div id="loginFormTea" class="hidden">
-                <input type="password" id="teaPass" placeholder="รหัสผ่านผู้จัดการระบบ" style="text-align:center;">
-                <button onclick="teacherLogin()" class="btn btn-primary" style="width:100%; justify-content:center;">
-                    เข้าสู่ระบบครู <i class="ph ph-shield-check"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pageStudent" class="hidden">
-        <div class="card animate__animated animate__slideInDown" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; background: linear-gradient(to right, #ffffff, #f0f9ff);">
-            <div>
-                <h2 style="margin:0; color:var(--primary);">สวัสดี, <span id="studentName">...</span> 👋</h2>
-                <div style="display:flex; gap:15px; margin-top:8px;">
-                    <span style="color:var(--secondary); font-size:0.95rem;">
-                        <i class="ph ph-clock"></i> เรียนไปแล้ว <b id="totalTime" style="color:var(--text);">0</b> นาที
-                    </span>
-                    <span style="color:var(--secondary); font-size:0.95rem;">
-                        <i class="ph ph-book-open"></i> จบแล้ว <b id="completedCount" style="color:var(--text);">0</b> บท
-                    </span>
-                </div>
-            </div>
-            <button onclick="showProfile()" class="btn btn-outline">
-                <i class="ph ph-chart-line-up"></i> ดูคะแนนของฉัน
-            </button>
-        </div>
-
-        <div id="lessonGrid" class="lesson-grid"></div>
-
-        <div id="viewer" class="hidden card animate__animated animate__fadeIn" style="margin-top:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:20px; margin-bottom:25px;">
-                <h2 id="viewTitle" style="margin:0; color:var(--primary);"></h2>
-                <div class="timer-badge" id="liveTimer">00:00</div>
-            </div>
-            <div id="lessonContent" style="min-height: 400px;"></div>
-            <div id="quizSection" class="hidden"></div>
-            
-            <div style="display:flex; gap:15px; margin-top:30px; padding-top:20px; border-top:1px solid #eee;">
-                <button id="btnQuiz" onclick="startQuiz()" class="btn btn-primary">
-                    <i class="ph ph-pencil-line"></i> ทำแบบทดสอบ
-                </button>
-                <button onclick="closeLesson()" class="btn btn-outline" style="color:var(--danger);">
-                    <i class="ph ph-x-circle"></i> ปิดบทเรียน
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pageTeacher" class="hidden animate__animated animate__fadeIn">
-        <div style="display:flex; gap:12px; margin-bottom:30px; background:white; padding:10px; border-radius:18px; box-shadow:var(--shadow);">
-            <button class="btn btn-primary" onclick="showAdm('stat')"><i class="ph ph-presentation-chart"></i> ภาพรวม</button>
-            <button class="btn btn-outline" onclick="showAdm('monitor')"><i class="ph ph-users-four"></i> ติดตามรายคน</button>
-        </div>
-
-        <div id="admStat" class="adm-section">
-            <div class="stats-grid">
-                <div class="card stat-card"><div class="stat-val" id="countStd">0</div><p>นักเรียนทั้งหมด</p></div>
-                <div class="card stat-card" style="border-color:var(--success);"><div class="stat-val" id="countPass">0%</div><p>ผ่านเกณฑ์สะสม</p></div>
-                <div class="card stat-card" style="border-color:var(--primary);"><div class="stat-val" id="countLesson">0</div><p>บทเรียนในระบบ</p></div>
-            </div>
-            <div class="card">
-                <h3 style="margin-top:0;"><i class="ph ph-chart-bar"></i> สถิติการเข้าเรียนรายหน่วย</h3>
-                <canvas id="mainChart" style="max-height:350px;"></canvas>
-            </div>
-        </div>
-
-        <div id="admMonitor" class="adm-section hidden">
-            <div class="card">
-                <h3 style="margin-top:0;"><i class="ph ph-list-magnifying-glass"></i> ติดตามเวลาเรียนจริง</h3>
-                <div style="overflow-x:auto;">
-                    <table style="width:100%;">
-                        <thead><tr><th>ชื่อ-นามสกุล</th><th>เวลาเรียนรวม</th><th>ความคืบหน้า</th><th>คะแนนล่าสุด</th></tr></thead>
-                        <tbody id="monitorTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // Config Supabase
-    const SB_URL = 'https://fddkpkcmkvitjkouxerg.supabase.co';
-    const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E';
-    const sb = window.supabase.createClient(SB_URL, SB_KEY);
-
-    const UNITS = { 
-        'unit1':'1. องค์ประกอบคอมพิวเตอร์', 
-        'unit2':'2. หลักการทำงาน', 
-        'unit3':'3. เครือข่ายสื่อสาร', 
-        'unit4':'4. เทคโนโลยีอินเทอร์เน็ต' 
-    };
-    
-    let user = null; 
-    let curLesson = null; 
-    let timer; 
-    let secs = 0; 
-    let currentUnit = '';
-
-    // SweetAlert Toast Config
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true
-    });
-
-    // Login Logic
-    function switchLogin(t) {
-        document.getElementById('loginFormStd').classList.toggle('hidden', t==='tea');
-        document.getElementById('loginFormTea').classList.toggle('hidden', t==='std');
-        document.getElementById('tabStd').className = t==='std' ? 'btn btn-primary' : 'btn';
-        document.getElementById('tabTea').className = t==='tea' ? 'btn btn-primary' : 'btn';
-    }
-
-    async function studentLogin() {
-        const code = document.getElementById('stdCode').value;
-        if(code.length < 5) return Toast.fire({ icon: 'warning', title: 'กรุณากรอกรหัส 5 หลัก' });
-
-        Swal.fire({ title: 'กำลังเข้าสู่ห้องเรียน...', didOpen: () => Swal.showLoading() });
-
-        const { data, error } = await sb.from('student_progress').select('*').eq('student_code', code).single();
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
         
-        if(error || !data) {
-            return Swal.fire({ icon: 'error', title: 'ไม่พบรหัสนี้', text: 'กรุณาติดต่อคุณครูเพื่อลงทะเบียน' });
+        <div id="loginSection" class="login-container animate__animated animate__fadeInDown">
+            <div class="card">
+                <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">🚀 เข้าสู่ห้องเรียนคอมพิวเตอร์</h1>
+                <p style="color: var(--secondary); margin-bottom: 2rem;">กรุณาเลือกประเภทการใช้งาน</p>
+                
+                <div class="tab-group">
+                    <button id="btnTabStd" class="tab-btn active" onclick="switchTab('std')">นักเรียน</button>
+                    <button id="btnTabTea" class="tab-btn" onclick="switchTab('tea')">คุณครู</button>
+                </div>
+
+                <div id="formStd">
+                    <input type="text" id="stdCodeInput" placeholder="กรอกรหัส 5 หลักของคุณ" maxlength="5" 
+                           style="width:100%; padding:1.2rem; border-radius:12px; border:2px solid #e2e8f0; text-align:center; font-size:1.5rem; margin-bottom:1.5rem;">
+                    <button onclick="loginStudent()" class="btn-main">เข้าเรียนเลย <i class="ph ph-caret-right"></i></button>
+                </div>
+
+                <div id="formTea" class="hidden">
+                    <input type="password" id="teaPassInput" placeholder="รหัสผ่านผู้จัดการระบบ" 
+                           style="width:100%; padding:1.2rem; border-radius:12px; border:2px solid #e2e8f0; text-align:center; margin-bottom:1.5rem;">
+                    <button onclick="loginTeacher()" class="btn-main">เข้าสู่ระบบครู <i class="ph ph-shield-check"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="studentDashboard" class="hidden animate__animated animate__fadeIn">
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(to right, #ffffff, #f0f9ff);">
+                <div>
+                    <h2 style="margin:0;">ยินดีต้อนรับ, <span id="stdName" style="color:var(--primary);">...</span> 👋</h2>
+                    <p style="margin:0.5rem 0 0 0; color:var(--secondary);">เวลาเรียนสะสม: <b id="totalStudyTime">0</b> นาที</p>
+                </div>
+                <button class="tab-btn active" onclick="showHistory()" style="flex:none; padding: 0.8rem 1.5rem;">
+                    <i class="ph ph-clock-counter-clockwise"></i> ประวัติการเรียน
+                </button>
+            </div>
+
+            <div id="lessonList" class="lesson-grid"></div>
+        </div>
+
+        <div id="lessonViewer" class="hidden animate__animated animate__zoomIn">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+                    <h2 id="lessonTitle" style="margin:0; color:var(--primary);">...</h2>
+                    <div class="timer-display" id="activeTimer">00:00</div>
+                </div>
+                <div id="contentArea" style="min-height: 400px; background: #f8fafc; border-radius: 15px; padding: 2rem;">
+                    </div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button id="quizBtn" onclick="startQuiz()" class="btn-main" style="flex:1;">ทำแบบทดสอบ</button>
+                    <button onclick="exitLesson()" class="btn-main" style="flex:1; background:var(--secondary);">กลับหน้าหลัก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const _URL = 'https://fddkpkcmkvitjkouxerg.supabase.co';
+        const _KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkZGtwa2Nta3ZpdGprb3V4ZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDIxMjQsImV4cCI6MjA4MzAxODEyNH0.7OLB2igeXv3ZbLYQ2AJf-HxGpgyxqjwfAjrDG1rhP3E';
+        const sb = window.supabase.createClient(_URL, _KEY);
+
+        let userSession = null;
+        let studyClock = null;
+        let elapsedSecs = 0;
+        let currentUnitKey = '';
+
+        const UNITS = {
+            'unit1': 'หน่วยที่ 1: ระบบคอมพิวเตอร์',
+            'unit2': 'หน่วยที่ 2: หลักการทำงาน',
+            'unit3': 'หน่วยที่ 3: เครือข่ายการสื่อสาร',
+            'unit4': 'หน่วยที่ 4: อินเทอร์เน็ต'
+        };
+
+        // UI Helpers
+        function switchTab(type) {
+            document.getElementById('btnTabStd').classList.toggle('active', type === 'std');
+            document.getElementById('btnTabTea').classList.toggle('active', type === 'tea');
+            document.getElementById('formStd').classList.toggle('hidden', type === 'tea');
+            document.getElementById('formTea').classList.toggle('hidden', type === 'std');
         }
 
-        user = data;
-        Swal.close();
-        document.getElementById('pageLogin').classList.add('hidden');
-        document.getElementById('pageStudent').classList.remove('hidden');
-        document.getElementById('authMenu').classList.remove('hidden');
-        document.getElementById('userDisplay').innerText = `นักเรียน: ${user.student_name}`;
-        document.getElementById('studentName').innerText = user.student_name;
-        
-        Toast.fire({ icon: 'success', title: `ยินดีต้อนรับ น้อง${user.student_name}` });
-        updateHeaderStats(); loadLessons();
-    }
+        function showAlert(icon, title, text) {
+            Swal.fire({ icon, title, text, showConfirmButton: false, timer: 2000, borderRadius: '20px' });
+        }
 
-    // Timer System
-    function startTimer(unit) {
-        currentUnit = unit; secs = 0;
-        if(timer) clearInterval(timer);
-        timer = setInterval(() => {
-            secs++;
-            const m = String(Math.floor(secs/60)).padStart(2,'0');
-            const s = String(secs%60).padStart(2,'0');
-            document.getElementById('liveTimer').innerText = `${m}:${s}`;
-        }, 1000);
-    }
+        // Authentication
+        async function loginStudent() {
+            const code = document.getElementById('stdCodeInput').value;
+            if(code.length !== 5) return showAlert('warning', 'แจ้งเตือน', 'กรุณากรอกรหัสให้ครบ 5 หลัก');
 
-    async function saveTime() {
-        if(secs < 3) return; // ไม่บันทึกถ้าเข้าน้อยกว่า 3 วินาที
-        const { data } = await sb.from('student_progress').select('study_time').eq('id', user.id).single();
-        let currentTimes = data.study_time || {};
-        currentTimes[currentUnit] = (currentTimes[currentUnit] || 0) + secs;
-        
-        await sb.from('student_progress').update({ study_time: currentTimes }).eq('id', user.id);
-        user.study_time = currentTimes;
-        updateHeaderStats();
-        
-        Toast.fire({ icon: 'info', title: `บันทึกเวลาเรียน ${Math.floor(secs/60)} นาที ${secs%60} วินาที` });
-    }
+            const { data, error } = await sb.from('student_progress').select('*').eq('student_code', code).single();
+            
+            if(error || !data) return showAlert('error', 'ผิดพลาด', 'ไม่พบข้อมูลนักเรียนในระบบ');
 
-    function updateHeaderStats() {
-        const totalSecs = Object.values(user.study_time || {}).reduce((a,b)=>a+(typeof b==='number'?b:0), 0);
-        document.getElementById('totalTime').innerText = Math.floor(totalSecs/60);
-        document.getElementById('completedCount').innerText = user.completed_lessons?.length || 0;
-    }
+            userSession = data;
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            document.getElementById('displayUserName').innerText = `นักเรียน: ${data.student_name}`;
+            document.getElementById('stdName').innerText = data.student_name;
+            
+            updateTimeDisplay(data.study_time);
+            loadLessons();
+            showAlert('success', 'เข้าสู่ระบบสำเร็จ', `ยินดีต้อนรับ น้อง${data.student_name}`);
+        }
 
-    // Lesson Viewer
-    async function loadLessons() {
-        const { data } = await sb.from('lessons').select('*');
-        const grid = document.getElementById('lessonGrid'); grid.innerHTML = '';
-        
-        Object.keys(UNITS).forEach((key, i) => {
-            const hasContent = data?.some(l => l.category === key);
-            grid.innerHTML += `
-                <div class="card lesson-card animate__animated animate__fadeInUp" style="animation-delay: ${i*0.1}s" onclick="openLesson('${key}')">
-                    <div class="lesson-num">${i+1}</div>
+        // Lesson Management
+        async function loadLessons() {
+            const { data: lessons } = await sb.from('lessons').select('*');
+            const list = document.getElementById('lessonList');
+            list.innerHTML = '';
+
+            Object.keys(UNITS).forEach((key, index) => {
+                const lesson = lessons?.find(l => l.category === key);
+                const card = document.createElement('div');
+                card.className = 'card lesson-card animate__animated animate__fadeInUp';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.innerHTML = `
+                    <div style="position:absolute; right:-10px; top:-10px; font-size:6rem; font-weight:900; color:#f8fafc; z-index:0;">${index+1}</div>
                     <div style="position:relative; z-index:1;">
-                        <h3 style="margin:0; color:${hasContent?'var(--primary)':'#cbd5e1'}">${UNITS[key]}</h3>
-                        <p style="margin:10px 0 0 0; font-size:0.85rem; color:${hasContent?'var(--success)':'#94a3b8'}; font-weight:bold;">
-                            ${hasContent ? '<i class="ph-fill ph-check-circle"></i> พร้อมเรียน' : '<i class="ph ph-clock"></i> เร็วๆ นี้'}
+                        <h3 style="margin:0; color: ${lesson ? 'var(--primary)' : '#cbd5e1'}">${UNITS[key]}</h3>
+                        <p style="margin-top:1rem; font-weight:bold; color: ${lesson ? 'var(--success)' : '#94a3b8'}">
+                            ${lesson ? '🟢 พร้อมเรียนแล้ว' : '⚪ ยังไม่มีเนื้อหา'}
                         </p>
                     </div>
-                </div>`;
-        });
-    }
-
-    async function openLesson(key) {
-        const { data, error } = await sb.from('lessons').select('*').eq('category', key).single();
-        if(error || !data) return Swal.fire('อดใจรออีกนิด', 'คุณครูกำลังเตรียมเนื้อหาบทนี้อยู่ครับ', 'info');
-
-        curLesson = data;
-        document.getElementById('lessonGrid').classList.add('hidden');
-        document.getElementById('viewer').classList.remove('hidden');
-        document.getElementById('viewTitle').innerText = data.title;
-        document.getElementById('lessonContent').innerHTML = data.content;
-        document.getElementById('quizSection').classList.add('hidden');
-        document.getElementById('lessonContent').classList.remove('hidden');
-        document.getElementById('btnQuiz').classList.remove('hidden');
-        
-        startTimer(key);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function closeLesson() {
-        saveTime();
-        clearInterval(timer);
-        document.getElementById('viewer').classList.add('hidden');
-        document.getElementById('lessonGrid').classList.remove('hidden');
-    }
-
-    // Quiz System
-    function startQuiz() {
-        if(!curLesson.quiz_data || curLesson.quiz_data.length === 0) return Swal.fire('ไม่มีข้อสอบ', 'บทนี้ไม่มีแบบทดสอบครับ', 'info');
-        
-        document.getElementById('lessonContent').classList.add('hidden');
-        document.getElementById('quizSection').classList.remove('hidden');
-        document.getElementById('btnQuiz').classList.add('hidden');
-
-        let html = '<h3 style="color:var(--primary); margin-bottom:25px;">📝 แบบทดสอบหลังเรียน</h3>';
-        curLesson.quiz_data.forEach((q, i) => {
-            html += `
-                <div class="card" style="margin-bottom:20px; background:#f8fafc; border:none;">
-                    <p style="font-weight:800;">ข้อที่ ${i+1}: ${q.question}</p>
-                    <div style="display:grid; gap:10px;">
-                        ${q.options.map((o, oi) => `
-                            <label style="display:flex; align-items:center; gap:10px; padding:12px; background:white; border-radius:10px; cursor:pointer; border:1.5px solid #eee;">
-                                <input type="radio" name="q${i}" value="${oi}" style="width:20px; height:20px;"> ${o}
-                            </label>
-                        `).join('')}
-                    </div>
-                </div>`;
-        });
-        html += `<button onclick="submitQuiz()" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:10px;">ส่งคำตอบ <i class="ph ph-paper-plane-tilt"></i></button>`;
-        document.getElementById('quizSection').innerHTML = html;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function submitQuiz() {
-        let score = 0; const total = curLesson.quiz_data.length;
-        curLesson.quiz_data.forEach((q, i) => {
-            const sel = document.querySelector(`input[name="q${i}"]:checked`);
-            if(sel && parseInt(sel.value) === q.correct) score++;
-        });
-
-        const percent = (score/total) * 100;
-        const passed = percent >= 60;
-
-        Swal.fire({
-            title: passed ? 'ยินดีด้วย! คุณสอบผ่าน' : 'พยายามอีกนิดนะ',
-            html: `<div style="font-size:3rem; font-weight:900; color:${passed?'var(--success)':'var(--danger)'}">${score}/${total}</div><p>คิดเป็น ${percent.toFixed(0)}%</p>`,
-            icon: passed ? 'success' : 'warning',
-            confirmButtonText: 'กลับสู่หน้าหลัก'
-        }).then(async () => {
-            await sb.from('quiz_results').insert([{ 
-                student_id: user.id, lesson_id: curLesson.id, score, total_score: total, passed 
-            }]);
-            
-            let done = user.completed_lessons || [];
-            if(!done.includes(curLesson.id)) done.push(curLesson.id);
-            await sb.from('student_progress').update({ completed_lessons: done }).eq('id', user.id);
-            
-            location.reload();
-        });
-    }
-
-    // Teacher View
-    async function showAdm(sec) {
-        document.querySelectorAll('.adm-section').forEach(s => s.classList.add('hidden'));
-        document.getElementById('adm' + sec.charAt(0).toUpperCase() + sec.slice(1)).classList.remove('hidden');
-        
-        if(sec === 'stat') {
-            const { data: stds } = await sb.from('student_progress').select('*');
-            const { data: less } = await sb.from('lessons').select('*');
-            const { data: res } = await sb.from('quiz_results').select('*');
-            
-            document.getElementById('countStd').innerText = stds.length;
-            document.getElementById('countLesson').innerText = less.length;
-            const rate = res.length ? (res.filter(r=>r.passed).length/res.length*100).toFixed(0) : 0;
-            document.getElementById('countPass').innerText = rate + '%';
-        }
-        
-        if(sec === 'monitor') {
-            const { data: stds } = await sb.from('student_progress').select('*');
-            const tb = document.getElementById('monitorTable'); tb.innerHTML = '';
-            stds.forEach(s => {
-                const totalMins = Object.values(s.study_time || {}).reduce((a,b)=>a+(typeof b==='number'?b:0), 0);
-                tb.innerHTML += `
-                    <tr style="border-bottom:1px solid #f1f5f9;">
-                        <td style="padding:15px;"><b>${s.student_name}</b><br><small style="color:var(--secondary);">${s.student_class} เลขที่ ${s.student_number}</small></td>
-                        <td><span style="color:var(--primary); font-weight:700;">${Math.floor(totalMins/60)}</span> น. ${totalMins%60} ว.</td>
-                        <td>${s.completed_lessons?.length || 0} บท</td>
-                        <td><button class="btn btn-sm btn-outline" onclick="Swal.fire('รหัสเข้าเรียน', '${s.student_code}', 'info')">ดูรหัส</button></td>
-                    </tr>`;
+                `;
+                if(lesson) card.onclick = () => openLesson(lesson);
+                list.appendChild(card);
             });
         }
-    }
 
-    function logout() { location.reload(); }
-</script>
+        function openLesson(lesson) {
+            currentUnitKey = lesson.category;
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('lessonViewer').classList.remove('hidden');
+            document.getElementById('lessonTitle').innerText = lesson.title;
+            document.getElementById('contentArea').innerHTML = lesson.content;
+            
+            startTimer();
+        }
+
+        // Timer System (เชื่อมต่อภาพ image_f346fa.png)
+        function startTimer() {
+            elapsedSecs = 0;
+            studyClock = setInterval(() => {
+                elapsedSecs++;
+                const mins = String(Math.floor(elapsedSecs / 60)).padStart(2, '0');
+                const secs = String(elapsedSecs % 60).padStart(2, '0');
+                document.getElementById('activeTimer').innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        async function exitLesson() {
+            clearInterval(studyClock);
+            
+            if(elapsedSecs > 5) {
+                const { data } = await sb.from('student_progress').select('study_time').eq('id', userSession.id).single();
+                let currentTimes = data.study_time || {};
+                currentTimes[currentUnitKey] = (currentTimes[currentUnitKey] || 0) + elapsedSecs;
+                
+                await sb.from('student_progress').update({ 
+                    study_time: currentTimes,
+                    last_login: new Date().toISOString()
+                }).eq('id', userSession.id);
+                
+                userSession.study_time = currentTimes;
+                updateTimeDisplay(currentTimes);
+                showAlert('info', 'ระบบบันทึกเวลา', `บันทึกเวลาเรียนเพิ่ม ${Math.floor(elapsedSecs/60)} นาที`);
+            }
+
+            document.getElementById('lessonViewer').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+        }
+
+        function updateTimeDisplay(timeObj) {
+            if(!timeObj) return;
+            const totalSecs = Object.values(timeObj).reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+            document.getElementById('totalStudyTime').innerText = Math.floor(totalSecs / 60);
+        }
+
+        function handleLogout() {
+            location.reload();
+        }
+    </script>
 </body>
 </html>
