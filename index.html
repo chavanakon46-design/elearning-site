@@ -22,29 +22,30 @@
         body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; min-height: 100vh; }
         .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; }
         
-        /* --- CURSOR POINTER SETTINGS (จุดที่กดได้เปลี่ยนเป็นมือ 👆) --- */
+        /* --- 1. CURSOR POINTER (แก้ให้รูปมือขึ้นทุกจุดที่กดได้) --- */
         button, .btn, .tab-btn, .admin-menu-btn, 
-        .lesson-card, .clickable-row, 
+        .lesson-card, .stat-card, 
         label, input[type="radio"], input[type="checkbox"],
-        .nav-link, .stat-card {
+        #admLessonList .card, /* เพิ่มมือให้รายการบทเรียนหน้าครู */
+        .clickable-row {
             cursor: pointer !important;
         }
 
         /* Navbar */
-        .navbar { background: rgba(255,255,255,0.9); backdrop-filter: blur(8px); padding: 15px 25px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position: sticky; top: 10px; z-index: 100; border: 1px solid #e2e8f0; }
+        .navbar { background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); padding: 15px 25px; border-radius: var(--radius); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position: sticky; top: 10px; z-index: 100; border: 1px solid #e2e8f0; }
         .brand { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; }
         
         /* Cards */
         .card { background: var(--card); border-radius: var(--radius); padding: 25px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #e2e8f0; transition: 0.3s; }
         
         /* Buttons */
-        .btn { padding: 10px 20px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Sarabun'; }
+        .btn { padding: 10px 20px; border-radius: 10px; border: none; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-family: 'Sarabun'; }
         .btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-outline { background: white; border: 1px solid #cbd5e1; color: var(--text); }
-        .btn-sm { padding: 5px 10px; font-size: 0.85rem; }
+        .btn-sm { padding: 6px 12px; font-size: 0.9rem; }
 
         /* Inputs */
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; margin-bottom: 10px; box-sizing: border-box; font-family: 'Sarabun'; transition: 0.3s; }
@@ -54,17 +55,26 @@
         .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 60vh; }
         .login-box { width: 100%; max-width: 450px; text-align: center; border-top: 5px solid var(--primary); }
         .login-tabs { display: flex; gap: 10px; background: #f1f5f9; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: bold; color: var(--secondary); transition: 0.3s; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; font-weight: bold; color: var(--secondary); transition: 0.3s; }
         .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Admin Lesson List (Specific for Teacher View) */
+        #admLessonList .card {
+            border-left: 4px solid var(--primary);
+            transition: 0.2s;
+        }
+        #admLessonList .card:hover {
+            background: #f0f9ff;
+            transform: translateX(5px);
+        }
 
         /* Grids & Tables */
         .lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-        .lesson-card { cursor: pointer; position: relative; overflow: hidden; min-height: 160px; display: flex; flex-direction: column; justify-content: center; padding: 25px; border: 2px solid transparent; transition: 0.3s; }
-        .lesson-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .lesson-card { position: relative; overflow: hidden; min-height: 160px; display: flex; flex-direction: column; justify-content: center; padding: 25px; border: 2px solid transparent; transition: 0.3s; }
+        .lesson-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .lesson-num { position: absolute; right: 10px; top: 0; font-size: 5rem; font-weight: 900; color: #f1f5f9; z-index: 0; line-height: 1; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        /* Stat Card: เพิ่มรูปมือและเอฟเฟกต์ */
         .stat-card { text-align: center; padding: 20px; border-bottom: 4px solid #eee; transition: 0.3s; }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); background: #fff; }
         .stat-val { font-size: 2rem; font-weight: 800; color: var(--primary); }
@@ -79,7 +89,6 @@
         #viewRead img, #viewRead video, #viewRead iframe { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin: 10px 0; }
         #viewRead { font-size: 1.1rem; line-height: 1.8; color: #334155; }
 
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
             .navbar { flex-direction: column; gap: 10px; text-align: center; }
             .login-tabs { flex-direction: column; }
@@ -149,16 +158,15 @@
         <div id="lessonViewer" class="hidden card animate__animated animate__fadeInUp">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px; flex-wrap:wrap; gap:10px;">
                 <h2 id="viewerTitle" style="margin:0; color:var(--primary);">Title</h2>
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; width:auto;">
                     <div class="timer-badge" id="lessonTimerDisp">00:00</div>
                     <button onclick="closeLesson()" class="btn btn-sm btn-outline"><i class="ph ph-x-circle"></i> ปิด</button>
                 </div>
             </div>
             
-            <div class="login-tabs" style="justify-content:flex-start; overflow-x:auto; padding:10px; background:#f8fafc;">
+            <div class="login-tabs" style="justify-content:flex-start; overflow-x:auto;">
                 <button class="tab-btn active" onclick="switchContent('read')" id="btnTabRead" style="min-width:100px;">📖 เนื้อหา</button>
-                <button class="tab-btn" onclick="openWebsiteDemo()" style="min-width:140px; color:#ffffff; background:#8b5cf6;">🌐 ดูตัวอย่างเว็บ</button> 
-                <button class="tab-btn" onclick="switchContent('quiz')" id="btnTabQuiz" style="min-width:120px;">📝 แบบทดสอบ</button>
+                <button class="tab-btn" onclick="switchContent('quiz')" id="btnTabQuiz" style="min-width:100px;">📝 แบบทดสอบ</button>
             </div>
 
             <div id="viewRead" class="animate__animated animate__fadeIn" style="min-height:300px; padding:10px;"></div>
@@ -214,7 +222,7 @@
                         <input type="hidden" id="editId">
                         <label>ชื่อบทเรียน</label><input type="text" id="editTitle">
                         <label>หมวดหมู่ (เช่น unit1)</label><select id="editCat"></select>
-                        <label>เนื้อหา (HTML)</label><textarea id="editBody" style="height: 200px; font-family: monospace;"></textarea>
+                        <label>เนื้อหา (HTML / Canva Embed)</label><textarea id="editBody" style="height: 200px; font-family: monospace;"></textarea>
                         
                         <div style="background: #f1f5f9; padding: 15px; border-radius: 12px; margin-top: 15px;">
                             <div style="display:flex; justify-content:space-between;">
@@ -224,9 +232,9 @@
                             <div id="quizListPreview" style="margin-top: 10px;"></div>
                         </div>
 
-                        <div style="margin-top: 20px; display: flex; gap: 10px;">
-                            <button onclick="saveLessonDB()" class="btn btn-primary">บันทึกทั้งหมด</button>
-                            <button onclick="deleteLessonDB()" class="btn btn-danger">ลบบทเรียนนี้</button>
+                        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap:wrap;">
+                            <button onclick="saveLessonDB()" class="btn btn-primary" style="flex:1;">💾 บันทึกทั้งหมด</button>
+                            <button onclick="previewLessonHTML()" class="btn btn-outline" style="flex:1; border-color:#8b5cf6; color:#8b5cf6;">👁️ ดูตัวอย่างที่ทำ</button> <button onclick="deleteLessonDB()" class="btn btn-danger">🗑️ ลบ</button>
                         </div>
                     </div>
                     <div id="editorEmpty" style="text-align: center; color: var(--secondary); padding: 50px;">เลือกบทเรียนทางซ้ายเพื่อแก้ไข</div>
@@ -422,20 +430,6 @@
         }
     }
 
-    // FUNCTION: ดูตัวอย่างเว็บ (Popup)
-    function openWebsiteDemo() {
-        Swal.fire({
-            title: '🌐 ตัวอย่างหน้าเว็บ',
-            html: `
-                <iframe src="https://www.google.com/webhp?igu=1" style="width:100%; height:400px; border:none; border-radius:10px;"></iframe>
-                <p style="margin-top:10px; font-size:0.9rem; color:#666;">*นี่คือหน้าตัวอย่างสำหรับการศึกษา</p>
-            `,
-            width: 800,
-            showConfirmButton: false,
-            showCloseButton: true
-        });
-    }
-
     // JSONB Time Tracking
     function startStudyTimer(unitKey) {
         currentUnitKey = unitKey;
@@ -589,7 +583,7 @@
         const term = document.getElementById('searchStd').value.toLowerCase();
         const tbody = document.getElementById('tbodyStd');
         tbody.innerHTML = students.filter(s => s.student_name.toLowerCase().includes(term) || s.student_code.includes(term)).map(s => `
-            <tr class="clickable-row" onclick="viewStudentDetail(${s.id}, '${s.student_name}', '${s.student_code}')">
+            <tr class="clickable-row">
                 <td>${(s.last_login && new Date() - new Date(s.last_login) < 300000) ? '<span class="status-badge online">ออนไลน์</span>' : '<span class="status-badge offline">ออฟไลน์</span>'}</td>
                 <td><b>${s.student_code}</b></td>
                 <td>${s.student_name}</td>
@@ -655,6 +649,18 @@
         Swal.fire('บันทึกสำเร็จ', '', 'success'); loadContentList();
     }
     async function deleteLessonDB() { if(confirm('ลบ?')) { await sb.from('lessons').delete().eq('id', document.getElementById('editId').value); loadContentList(); } }
+
+    // NEW FUNCTION: PREVIEW LESSON (ในหน้า Editor ครู)
+    function previewLessonHTML() {
+        const content = document.getElementById('editBody').value;
+        Swal.fire({
+            title: 'ตัวอย่างบทเรียน',
+            html: `<div style="text-align:left; max-height:400px; overflow-y:auto;">${content}</div>`,
+            width: 800,
+            showCloseButton: true,
+            showConfirmButton: false
+        });
+    }
 
     // Quiz Creator in Admin
     function renderQuizPreview() {
